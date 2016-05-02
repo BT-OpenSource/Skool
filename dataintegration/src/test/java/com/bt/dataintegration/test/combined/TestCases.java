@@ -18,6 +18,7 @@ import com.bt.dataintegration.hive.HiveProcessImpl;
 import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.HadoopConfig;
 import com.bt.dataintegration.sqoop.ImplSqoopImport;
+import com.bt.dataintegration.utilities.Utility;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCases {
@@ -329,9 +330,11 @@ public class TestCases {
 		Assert.assertNotNull(this.conf.getClusterUsername());
 	}
 	
-	@Test
+	@Ignore
 	public void _36_validateCreateTableQueryApp() {
 		this.conf =conf.getHadoopConfigProperties();
+		String cmd1 = "mkdir "+dbConf.getTableName();
+		Utility.executeSSH(cmd1);
 		new HiveProcessImpl().copyHiveScriptsToHDFS(conf);
 		if(conf.getSqoopFileFormat().contains("avro")){
 			String hiveDirectory = "/user/" + conf.getQueueName() + "/landing/staging/"
