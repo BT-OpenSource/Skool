@@ -1,0 +1,74 @@
+{
+  "type" : "record",
+  "name" : "EMPLOYEES",
+  "doc" : "Sqoop import of EMPLOYEES",
+  "fields" : [ {
+    "name" : "EMPLOYEE_ID",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "EMPLOYEE_ID",
+    "sqlType" : "2"
+  }, {
+    "name" : "FIRST_NAME",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "FIRST_NAME",
+    "sqlType" : "12"
+  }, {
+    "name" : "LAST_NAME",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "LAST_NAME",
+    "sqlType" : "12"
+  }, {
+    "name" : "EMAIL",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "EMAIL",
+    "sqlType" : "12"
+  }, {
+    "name" : "PHONE_NUMBER",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "PHONE_NUMBER",
+    "sqlType" : "12"
+  }, {
+    "name" : "HIRE_DATE",
+    "type" : [ "null", "long" ],
+    "default" : null,
+    "columnName" : "HIRE_DATE",
+    "sqlType" : "93"
+  }, {
+    "name" : "JOB_ID",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "JOB_ID",
+    "sqlType" : "12"
+  }, {
+    "name" : "SALARY",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "SALARY",
+    "sqlType" : "2"
+  }, {
+    "name" : "COMMISSION_PCT",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "COMMISSION_PCT",
+    "sqlType" : "2"
+  }, {
+    "name" : "MANAGER_ID",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "MANAGER_ID",
+    "sqlType" : "2"
+  }, {
+    "name" : "DEPARTMENT_ID",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "DEPARTMENT_ID",
+    "sqlType" : "2"
+  } ],
+  "tableName" : "EMPLOYEES"
+}
+
