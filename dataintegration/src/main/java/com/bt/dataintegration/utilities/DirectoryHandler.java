@@ -341,7 +341,7 @@ public static void cleanUpWorkspace(Object obj){
 	
 	
 	PrintWriter out = null;
-	try {
+	/*try {
 			
 			out = new PrintWriter(passFileName);
 			out.println("");
@@ -352,7 +352,7 @@ public static void cleanUpWorkspace(Object obj){
 	} 
 		finally{
 		out.close();
-		}
+		}*/
 	try {
 			out = new PrintWriter(jobPropName);
 			out.println("");
@@ -391,7 +391,7 @@ public static void cleanUpLanding(Object obj){
 		throw new Error();
 	}
 	PrintWriter out = null;
-	try {
+	/*try {
 			
 			out = new PrintWriter(passFileName);
 			out.println("");
@@ -403,7 +403,7 @@ public static void cleanUpLanding(Object obj){
 	} 
 		finally{
 		out.close();
-		}
+		}*/
 }
 
 public static void cleanUpWorkspaceExport(Object obj){
