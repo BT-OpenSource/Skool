@@ -71,6 +71,79 @@ public static void createWorkflowPath(DIConfig conf){
 		shellout = Utility.executeSSH(cmd);
 		if(shellout !=0){
 			logger.error("Directory already exists:: "+landingDir);
+			throw new Error("Failed to create directory. Please deletpackage com.bt.dataintegration.utilities;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.apache.log4j.Logger;
+
+import com.bt.dataintegration.property.config.DIConfig;
+import com.bt.dataintegration.property.config.HadoopConfig;
+
+public class DirectoryHandler {
+	final static Logger logger = Logger.getLogger(DirectoryHandler.class);
+	public static String targetDirYear = "";
+	public static String targetDirMonth = "";
+	public static String targetDirDate = "";
+	public static String targetDirHour = "";
+	public static String targetDirMinute = ""; 
+	public static String targetDirMonthWords = ""; 
+	
+	static{
+		Date date = new Date();
+		Calendar cal;
+
+		cal = Calendar.getInstance();
+		cal.setTime(date);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+		targetDirYear = sdf.format(date);
+		
+		sdf = new SimpleDateFormat("MM");
+		targetDirMonth = sdf.format(date);
+		
+		targetDirMonthWords= new SimpleDateFormat("MMM").format(cal.getTime());
+		
+		sdf = new SimpleDateFormat("dd");
+		targetDirDate = sdf.format(date);
+		
+		sdf = new SimpleDateFormat("HH");
+		targetDirHour = sdf.format(date);
+		
+		sdf = new SimpleDateFormat("mm");
+		targetDirMinute = sdf.format(date);
+}
+	
+public static void createWorkflowPath(DIConfig conf){
+	  int shellout = 1;
+	/*if(conf.getEnvDetails().equalsIgnoreCase("1")){
+		nameNode = NAMENODE;
+	}
+	else
+	{
+		nameNode = NAMENODE_VM;
+	}*/
+	String workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
+	String landingDir=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+	String cmd="";
+   
+		logger.info("Creating workspace directory");
+		cmd = "hadoop fs -mkdir -p "+workspacePath;
+		shellout = Utility.executeSSH(cmd);
+		if(shellout !=0){
+			logger.error("Failed to create directory:: "+workspacePath);
+			throw new Error("Failed to create directory. Please delete the above directory and re-run the application");
+		}	
+		
+		logger.info("Creating landing directory");
+		cmd = "hadoop fs -mkdir -p "+landingDir;
+		shellout = Utility.executeSSH(cmd);
+		if(shellout !=0){
+			logger.error("Directory already exists:: "+landingDir);
 			throw new Error("Failed to create directory. Please delete the above directory and re-run the application");
 		}
 
@@ -374,13 +447,13 @@ public static void cleanUpLanding(Object obj){
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-		landingDir=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+		landingDir=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName()+"/*";
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-		landingDir=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+		landingDir=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName()+"/*";
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 	}
 	String cmd = "hadoop fs -rm -r "+landingDir;
@@ -550,88 +623,3 @@ public static void cleanUpWorkspaceFile(Object obj){
 		jobPropName = conf.getTableName()+"/job.properties";
 	}
 	cmd = "hadoop fs -rm -r "+workspacePath;
-	shellout = Utility.executeSSH(cmd);
-	if(shellout !=0){
-		logger.error("Error in cleaning up workspace "+ workspacePath);
-		throw new Error();
-	}
-	
-	
-	/*PrintWriter out = null;
-	
-	try {
-			out = new PrintWriter(jobPropName);
-			out.println("");
-		} catch (FileNotFoundException e) {
-			logger.error("job.properties file not found");
-			logger.error("", e);
-		//cleanUpWorkspace(conf);
-		throw new Error(e);
-	} 
-		finally{
-		out.close();
-		}*/
-}
-
-/*public static void createTargetDirectory(DIConfig conf){
-	int shellout = 1;
-	if(conf.getEnvDetails().equalsIgnoreCase("1")){
-		nameNode = NAMENODE;
-	}
-	else
-	{
-		nameNode = NAMENODE_VM;
-	}
-	String cmd = "hadoop fs -mkdir -p "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/"+conf.getTableName()+"/landing/DELTA_DATA/"+targetDirYear+"/"+targetDirMonth+"/"+targetDirDate+"/"+targetDirHour;
-	shellout = Utility.executeSSH(cmd);
-	if(shellout !=0){
-		throw new Error();
-	}
-}
-*/
-/*public static void createTargetDirectorySqoop(DIConfig conf){
-	int shellout =1;
-	if(conf.getEnvDetails().equalsIgnoreCase("1")){
-		nameNode = NAMENODE;
-	}
-	else
-	{
-		nameNode = NAMENODE_VM;
-	}
-	String cmd = "hadoop fs -mkdir -p "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/"+conf.getTableName()+"/landing";
-	shellout = Utility.executeSSH(cmd);
-	if(shellout !=0){
-		throw new Error();
-	}
-}
-*/
-//one more method required to create target directory dynamically in oozie
-/*public static void updateJobPropFile(){
-	Properties jobProp = Utility.readConfigProperties("job.properties");
-	jobProp.setProperty("lastModifiedDateValueLowerBound", jobProp.getProperty("lastModifiedDateValueUpperBound"));
-	String current_date = targetDirDate+"-"+targetDirMonth+"-"+targetDirYear+" "+targetDirHour+":"+targetDirMinute;
-	jobProp.setProperty("lastModifiedDateValueUpperBound", "TO_DATE('"+current_date+"','dd-mm-yyyy hh24:mi')");
-	jobProp.setProperty("targetDirYear", targetDirYear);
-	jobProp.setProperty("targetDirMonth", targetDirMonth);
-	jobProp.setProperty("targetDirDate", targetDirDate);
-	jobProp.setProperty("targetDirHour", targetDirHour);
-	jobProp.setProperty("targetDirMinute", targetDirMinute);
-	OutputStream fout = null;
-	try {
-		fout = new FileOutputStream("job.properties");
-		try {
-			jobProp.store(fout, null);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	} catch (FileNotFoundException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-
-}
-*/
-
-
-}

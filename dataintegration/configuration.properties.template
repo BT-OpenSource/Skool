@@ -1,6 +1,6 @@
 ########################################## CONFIGURATION DETAILS TO BE FILLED BY USER ##########################################
 #set flag 1 for import and 2 for export and 3 for files.
-import_export_file_flag=3
+import_export_file_flag=1
 
 ########################################## PROPERTIES COMMON TO ALL TRANSPORT TYPE ##########################################
 
