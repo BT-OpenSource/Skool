@@ -352,7 +352,7 @@ public static void cleanUpWorkspace(Object obj){
 	} 
 		finally{
 		out.close();
-		}*/
+		}
 	try {
 			out = new PrintWriter(jobPropName);
 			out.println("");
@@ -363,7 +363,7 @@ public static void cleanUpWorkspace(Object obj){
 	} 
 		finally{
 		out.close();
-		}
+		}*/
 }
 
 public static void cleanUpLanding(Object obj){
