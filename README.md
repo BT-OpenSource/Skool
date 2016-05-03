@@ -31,6 +31,7 @@ And of course Skool itself is open source with a [public repository][Skool]
 ### Installation
  ```sh
  create a directory eg: mkdir skool_tool
+ cd skool_tool
  git clone [git-repo-url]
  cd Skool
  mkdir libs
