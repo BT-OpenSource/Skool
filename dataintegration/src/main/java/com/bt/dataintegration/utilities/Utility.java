@@ -228,7 +228,7 @@ public static Map<String, String> getMappedTable(LinkedHashMap<String, List<Stri
 				hiveMappedTable.put(oraTable.getKey(), "DOUBLE");
 				break;
 			case "DATE":
-				hiveMappedTable.put(oraTable.getKey(), "DATE");
+				hiveMappedTable.put(oraTable.getKey(), "STRING");
 				break;
 			case "BINARY_FLOAT":
 				hiveMappedTable.put(oraTable.getKey(), "DOUBLE");
@@ -237,7 +237,7 @@ public static Map<String, String> getMappedTable(LinkedHashMap<String, List<Stri
 				hiveMappedTable.put(oraTable.getKey(), "DOUBLE");
 				break;
 			case "TIMESTAMP":
-				hiveMappedTable.put(oraTable.getKey(), "DATE");
+				hiveMappedTable.put(oraTable.getKey(), "STRING");
 				break;
 			case "CHAR":
 				hiveMappedTable.put(oraTable.getKey(), "STRING");
