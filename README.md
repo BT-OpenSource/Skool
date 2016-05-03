@@ -36,7 +36,7 @@ And of course Skool itself is open source with a [public repository][Skool]
  git clone [git-repo-url]
  cd Skool/dataintegration
 ```
-edit the congiguration.properties.template and password.properties.template and rename it to congiguration.properties and password.properties
+edit the configuration.properties.template and password.properties.template and rename it to configuration.properties and password.properties
 ```sh
 mvn install
 cp target/libs/* ../../libs
