@@ -18,6 +18,7 @@ import com.bt.dataintegration.hive.HiveProcessImpl;
 import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.HadoopConfig;
 import com.bt.dataintegration.sqoop.ImplSqoopImport;
+import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -454,4 +455,13 @@ public class TestCases {
 		this.conf =conf.getHadoopConfigProperties();
 		Assert.assertNotNull(conf.getTargetDirMinute());
 	}
+	
+	@Test
+	public void _47_validateMinute() {
+		this.conf =conf.getHadoopConfigProperties();
+		DirectoryHandler.cleanUpWorkspace(conf);
+		DirectoryHandler.cleanUpLanding(conf);
+	}
+	
+		
 }
