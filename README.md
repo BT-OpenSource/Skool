@@ -32,9 +32,8 @@ And of course Skool itself is open source with a [public repository][Skool]
  ```sh
  create a directory eg: mkdir skool_tool
  cd skool_tool
- git clone [git-repo-url]
- cd Skool
  mkdir libs
+ git clone [git-repo-url]
  cd Skool/dataintegration
 ```
 edit the congiguration.properties.template and password.properties.template and rename it to congiguration.properties and password.properties
