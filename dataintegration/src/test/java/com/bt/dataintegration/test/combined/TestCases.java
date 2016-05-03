@@ -460,7 +460,7 @@ public class TestCases {
 	public void _47_validateMinute() {
 		this.conf =conf.getHadoopConfigProperties();
 		DirectoryHandler.cleanUpWorkspace(conf);
-		DirectoryHandler.cleanUpLanding(conf);
+		//DirectoryHandler.cleanUpLanding(conf);
 	}
 	
 		
