@@ -2,12 +2,20 @@
 An open Source hadoop Data Integration Tool.
 
 ### Overview
-Skool is designed for those users who want to land their data in HDFS and perform analytics on them. This tool takes a property/configuration file as input from the user and runs the application which validates the following –
+Skool - Hadoop Data integration tool which automates data engineering and can bring data into and out of Hadoop from RDBMS (0.1 version supports Oracle only 10G and above) and from files (Comma seprated, tab seprated, muti charcter file seprator).
+This tool takes a property/configuration file as input from the user and runs the application which validates the following –
 -	All the user provided details.
 -	Connection to source database.
 -	Sqoop import (for one record) as a check.
 -	Generates all required files and pushes them to HDFS.
 -	Generates a workflow to be scheduled in Oozie.
+
+
+#### Advantages of a  Skool:
+- Effort to write numerous lines of code for data integration would be replaced with a few clicks, thus saving valuable time.
+- Code consistency  & standard would be maintained.
+- Capture lineage and avoid making data swamp.
+- Generates an executable file/Ozzie Workflow which can be used across the platform with ease.
 
 This tool gives the advantage to just run the application and have all the scripts, required files and the Oozie coordinator and workflow xml generated automatically which in turn will perform milestone/incremental pulls as AVRO data files, have HIVE table created over them.
 One of the catching features of this tool is that it will give the user an AUDIT table for all the workflow actions, its failures if any along with more useful details which will help keep a track of the entire workflow.
