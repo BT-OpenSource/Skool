@@ -53,10 +53,8 @@ cd ..
 mvn install
 cp target/libs/* ../../libs
 cp target/dataintegration-0.0.1-SNAPSHOT.jar ../../
+cp configuration/configuration.properties ../../configuration/
 cd ../..
-
-**copy the configuration.properties edited earlier to the directory skool_tool/configuration/  
-
 cp Skool/di_tool_runnable/* configuration/
 mv configuration/run.sh .
 sh run.sh 
