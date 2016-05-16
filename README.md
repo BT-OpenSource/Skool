@@ -47,7 +47,7 @@ And of course Skool itself is open source with a [public repository][Skool]
 
 **edit the configuration.properties.template and password.properties.template and rename it to configuration.properties and password.properties**
 
-**you need to get ojdbv6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory**
+**you need to get ojdbc6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory**
 
 cd ..
 mvn install
