@@ -41,21 +41,22 @@ And of course Skool itself is open source with a [public repository][Skool]
  create a directory eg: mkdir skool_tool
  cd skool_tool
  mkdir libs
+ mkdir configuration
  git clone [git-repo-url]
  cd Skool/dataintegration
-```
+
 edit the configuration.properties.template and password.properties.template and rename it to configuration.properties and password.properties
 
 you need to get ojdbv6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory
-```sh
+
 mvn install
 cp target/libs/* ../../libs
 cp target/dataintegration-0.0.1-SNAPSHOT.jar ../../
 cd ../..
-```
-copy the configuration.properties edited earlier to the directory skool_tool
-```sh
-cp Skool/di_tool_runnable/* .
+
+copy the configuration.properties edited earlier to the directory skool_tool/configuration/
+
+cp Skool/di_tool_runnable/* configuration/
 sh run.sh 
 ```
 #### License
