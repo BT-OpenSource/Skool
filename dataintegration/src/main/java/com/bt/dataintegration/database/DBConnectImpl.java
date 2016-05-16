@@ -6,14 +6,12 @@
 
 package com.bt.dataintegration.database;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,7 +29,6 @@ import org.apache.log4j.Logger;
 
 import static com.bt.dataintegration.constants.Constants.*;
 
-import com.bt.dataintegration.constants.Constants;
 import com.bt.dataintegration.property.config.*;
 import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
@@ -49,7 +46,7 @@ public class DBConnectImpl implements IDBConnect {
 		InputStream ips = null;
 		//ips = DBConnectImpl.class.getClassLoader().getResourceAsStream(DATABASE_PROPERTIES);
 		try {
-			ips = new FileInputStream("database.properties");
+			ips = new FileInputStream(DATABASE_PROPERTIES_FILE);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -472,7 +469,7 @@ public class DBConnectImpl implements IDBConnect {
 		String passFileName = conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 		String cmd1 = "hadoop fs -ls /user/"+conf.getInstanceName()+"/HDI_Password_Repository/"+passFileName;
 		shellout1 = Utility.executeSSH(cmd1);
-		if(shellout1 ==0){
+		if(shellout1 ==SHELL_SUCCESS){
 			logger.warn("Password file with the name "+passFileName+" already exists. Same file will be used for sqoop import");
 			DirectoryHandler.createNewFile(conf, passFileName, conf.getSourcePassword());
 		}
@@ -487,7 +484,7 @@ public class DBConnectImpl implements IDBConnect {
 			cmd = "hadoop fs -put "+conf.getTableName()+"/"+passFileName+" "+passwordPath+passFileName;
 			int shellout = 1;
 			shellout = Utility.executeSSH(cmd);
-			if(shellout !=0){
+			if(shellout !=SHELL_SUCCESS){
 				logger.error("Failed to send password file to HDFS");
 				throw new Error();
 			}
@@ -495,7 +492,7 @@ public class DBConnectImpl implements IDBConnect {
 			cmd = "hadoop fs -chmod 600 "+passwordPath+passFileName;
 			shellout = 1;
 			shellout = Utility.executeSSH(cmd);
-			if(shellout !=0){
+			if(shellout !=SHELL_SUCCESS){
 				logger.error("Failed to send password file to HDFS");
 				throw new Error();
 			}
@@ -590,15 +587,24 @@ public class DBConnectImpl implements IDBConnect {
 		Properties prop = new Properties();
 		OutputStream fout = null;
 		//String fileName = conf.getTableName()+"/job.properties";
-		String fileName = "job.properties";
+		//String fileName = "job.properties";
 		StringBuffer s= new StringBuffer();
 		int clobBlobFlag = 0;
 		String workspacePath="${nameNode}/user/${queueName}/workspace/HDI_${source_name}_${schema_name}_${tableName}";
-		String landingDir="${nameNode}/user/${queueName}/landing/staging/${source_name}/${schema_name}/HDI_${tableName}";
+		String landingDir="";
+		String landingDirApp = "";
+		String interimDir = conf.getInterimLandingDir();
+		if("".equals(interimDir)){
+			landingDir="${nameNode}/user/${queueName}/${source_name}/${schema_name}/HDI_${tableName}";
+			landingDirApp=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+		}else{
+			landingDir="${nameNode}/user/${queueName}/"+interimDir+"/${source_name}/${schema_name}/HDI_${tableName}";
+			landingDirApp=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/"+interimDir+"/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+		}
 		String current_date = DirectoryHandler.targetDirDate+"-"+DirectoryHandler.targetDirMonthWords+"-"+DirectoryHandler.targetDirYear+" "+DirectoryHandler.targetDirHour+":"+DirectoryHandler.targetDirMinute;
 		try {
 
-			fout = new FileOutputStream(fileName);
+			fout = new FileOutputStream(JOB_PROP_FILE);
 			prop.setProperty("import_export_flag", conf.getImport_export_flag());
 			prop.setProperty("nameNode",conf.getWorkflowNameNode());
 			prop.setProperty("jobTracker",conf.getJobTracker());
@@ -626,7 +632,7 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("success_emails",conf.getSuccessEmailId());
 			prop.setProperty("failure_emails",conf.getFailureEmailId());
 			prop.setProperty("tableSize",tabProp.getTableSize().toString());
-			
+			prop.setProperty("landingDirApp",landingDirApp);
 			
 			logger.info("Setting properties for job.properties...");
 			
@@ -705,12 +711,12 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("queryMilestone", queryMilestone);
 			
 			String queryIncremental = query[0] + "${lastModifiedDateColumn} > '${lastModifiedDateValueLowerBound}' and ${lastModifiedDateColumn} <= '${lastModifiedDateValueUpperBound}' and $CONDITIONS";
-			prop.setProperty("queryIncremental", queryIncremental);
-			logger.info(queryIncremental);
+			//prop.setProperty("queryIncremental", queryIncremental);
+			//logger.info(queryIncremental);
 			
-			prop.setProperty("sqoopWhereClause",conf.getLastModifiedDateColumn() + " > '01-JAN-1000' and " + conf.getLastModifiedDateColumn() +" <= TO_DATE('"+current_date+"','dd-mm-yyyy hh24:mi')");
+			//prop.setProperty("sqoopWhereClause",conf.getLastModifiedDateColumn() + " > '01-JAN-1000' and " + conf.getLastModifiedDateColumn() +" <= TO_DATE('"+current_date+"','dd-mm-yyyy hh24:mi')");
 			
-			prop.setProperty("whereClause","${lastModifiedDateColumn} > '${lastModifiedDateValueLowerBound}' and ${lastModifiedDateColumn} <= '${lastModifiedDateValueUpperBound}'");
+			//prop.setProperty("whereClause","${lastModifiedDateColumn} > '${lastModifiedDateValueLowerBound}' and ${lastModifiedDateColumn} <= '${lastModifiedDateValueUpperBound}'");
 			
 			prop.setProperty("sqoopColumns",query[1]);
 			prop.setProperty("sqoopTableName", conf.getTableOwner()+"."+conf.getTableName());
@@ -723,9 +729,10 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("DBConnectString", s.toString());
 			
 			prop.setProperty("userName", conf.getSourceUsername());
-			
+			prop.setProperty("database_host",conf.getSourceHostName());
 			//prop.setProperty("password", "${nameNode}/user/${queueName}/HDI_Password_Repository/${source_name}_${schema_name}_pfile.txt");
-			String alias = "hdi." + conf.getSourceName() + "." + conf.getTableOwner() + ".pswd";
+			//String alias = "hdi." + conf.getSourceName() + "." + conf.getTableOwner() + ".pswd";
+			String alias = "hdi_" +conf.getSourceHostName()+"_"+conf.getSourceName() + "_" + conf.getTableOwner() + ".pswd"; 
 			prop.setProperty("password_alias", alias);
 			
 			String pwdProviderPath = JCEKS + "/" + conf.getInstanceName() + "/HDI_Password_Repository/${password_alias}";
@@ -782,11 +789,11 @@ public class DBConnectImpl implements IDBConnect {
 			
 			
 			
-			prop.setProperty("shell_file", "update_last_col_value.sh");
-			prop.setProperty("shell_file_path", "${wf_application_path}/unix_date.txt");
-			prop.setProperty("oraJarPath", "${wf_application_path}/ojdbc6-11.2.0.3.jar#ojdbc6-11.2.0.3.jar");
+			prop.setProperty("shell_file",UPDATE_LAST_COL_VALUE_SCRIPT);
+			prop.setProperty("shell_file_path", "${wf_application_path}/"+getAbsoluteName(UNIX_DATE_FILE));
+			prop.setProperty("oraJarPath", "${wf_application_path}/"+getAbsoluteName(OJDBC_JAR)+"#"+getAbsoluteName(OJDBC_JAR));
 			prop.setProperty("pigScript", "${wf_application_path}/HDI_${tableName}_COMPRESS_DATA.pig");
-			prop.setProperty("hiveCreateScript", "${wf_application_path}/HDI_${tableName}_CREATE_AVRO_TABLE.hql");
+			prop.setProperty("hiveCreateScript", "${wf_application_path}/HDI_${tableName}_CREATE_TABLE.hql");
 			prop.setProperty("hiveAddPartScript", "${wf_application_path}/HDI_${tableName}_ADD_PARTITION.hql");
 			//prop.setProperty("hiveAddPart", "${nameNode}/user/${queueName}/${tableName}/landing/DELTA_DATA/${targetDirYear}/${targetDirMonth}/${targetDirDate}/${targetDirHour}/${targetDirMinute}");
 			prop.setProperty("kerberos_flag", conf.getEnvDetails());
@@ -799,13 +806,13 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("shell_file_init", "refresh_last_col_value.sh");
 			prop.setProperty("audit_log_file_path","${nameNode}/user/${queueName}/HDI_AUDIT/audit_logs.txt");
 			prop.setProperty("audit_log_path","${nameNode}/user/${queueName}/HDI_AUDIT");
-			prop.setProperty("audit_shell_file","audit_logs.sh");
-			prop.setProperty("error_shell_file","error_logs.sh");
+			prop.setProperty("audit_shell_file",AUDIT_LOG_SCRIPT);
+			prop.setProperty("error_shell_file",ERROR_LOG_SCRIPT);
 			prop.setProperty("audit_table_name","HDI_AUDIT");
-			prop.setProperty("housekeeping_shell_file","housekeep.sh");
+			prop.setProperty("housekeeping_shell_file",HOUSE_KEEPING_SCRIPT);
 			prop.setProperty("hive_create_audit_table","HDI_CREATE_AUDIT_TABLE.hql");
 			//String auditTableCols = "WORKFLOW_ID STRING,WORKFLOW_NAME STRING,RUN_NO STRING,JOB_START_TIME STRING,JOB_END_TIME STRING,ORACLE_TABLE_NAME STRING,SQOOP_IE_FLAG STRING,HADOOP_RAW_DATA_DIR STRING,HADOOP_FINAL_DATA_DIR STRING,RECORD_COUNT STRING";
-			String auditTableCols = Constants.HDI_AUDIT_COLS;
+			String auditTableCols = HDI_AUDIT_COLS;
 
 			prop.setProperty("hdi_audit_table_cols",auditTableCols);
 			
@@ -821,7 +828,7 @@ public class DBConnectImpl implements IDBConnect {
 			
 			prop.store(fout, null);
 			
-			logger.debug("Property set as: " + fileName);
+			logger.debug("Property set as: " + JOB_PROP_FILE);
 			
 		} catch (Exception e) {
 			logger.error("Error Setting properties at JobProperties.storeProperties()");
@@ -849,8 +856,8 @@ public class DBConnectImpl implements IDBConnect {
 			}
 		}
 
-		DirectoryHandler.sendFileToHDFS(conf, fileName);
-		DirectoryHandler.givePermissionToHDFSFile(conf, fileName);
+		DirectoryHandler.sendFileToHDFS(conf, JOB_PROP_FILE);
+		DirectoryHandler.givePermissionToHDFSFile(conf,JOB_PROP_FILE);
 	}
 	
 	
@@ -860,12 +867,12 @@ public class DBConnectImpl implements IDBConnect {
 		Properties prop = new Properties();
 		OutputStream fout = null;
 		//String fileName = conf.getTableName()+"/job.properties";
-		String fileName = "job.properties";
+		//String fileName = "job.properties";
 		StringBuffer s= new StringBuffer();
 		String workspacePath="${nameNode}/user/${queueName}/workspace/HDI_${source_name}_${schema_name}_${tableName}_EXPORT";
 		try {
 
-			fout = new FileOutputStream(fileName);
+			fout = new FileOutputStream(JOB_PROP_FILE);
 			prop.setProperty("import_export_flag", conf.getImport_export_flag());
 			prop.setProperty("nameNode",conf.getWorkflowNameNode());
 			prop.setProperty("jobTracker",conf.getJobTracker());
@@ -949,7 +956,7 @@ public class DBConnectImpl implements IDBConnect {
 			
 			prop.store(fout, null);
 			
-			logger.debug("Property set as: " + fileName);
+			logger.debug("Property set as: " + JOB_PROP_FILE);
 			
 		} catch (Exception e) {
 			logger.error("Error Setting properties at JobProperties.storeProperties()");
@@ -975,8 +982,8 @@ public class DBConnectImpl implements IDBConnect {
 			}
 		}
 
-		DirectoryHandler.sendFileToHDFS(conf, fileName);
-		DirectoryHandler.givePermissionToHDFSFile(conf, fileName);
+		DirectoryHandler.sendFileToHDFS(conf, JOB_PROP_FILE);
+		DirectoryHandler.givePermissionToHDFSFile(conf,JOB_PROP_FILE);
 	}
 	
 	public String setSplitbyCloumn(DIConfig conf, TableProperties tabProp){
@@ -1036,5 +1043,9 @@ public class DBConnectImpl implements IDBConnect {
 		}
 	}
 
+ public String getAbsoluteName(String name){ 
+	return name.split("/")[1];
+	 
+ }
 
 }

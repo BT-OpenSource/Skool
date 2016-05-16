@@ -1,5 +1,7 @@
 package com.bt.dataintegration.oozie.workflow.main;
 
+import static com.bt.dataintegration.constants.Constants.*;
+
 import java.util.LinkedList;
 
 import com.bt.dataintegration.constants.Constants;
@@ -25,9 +27,6 @@ public class JavaMain implements Constants {
 	
 	public ActionJava setJavaMain(HadoopConfig hconf) {
 		
-		String jobPropPath = "${nameNaode}"+
-				"/user/cloudera/" + hconf.getQueueName() + "/" + 
-				hconf.getTableName() + "/workspace";
 		
 		/*gprop.setName(JAVA_CP_QUEUENAME);
 		gprop.setValue("${queueName}");*/
@@ -39,20 +38,20 @@ public class JavaMain implements Constants {
 		args.add("${file_mask}");
 		args.add("${delimiter}");
 		args.add("${sourceDirectory}");
-		args.add("${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['temp_dir']}");
-		args.add("${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['rejected_dir']}");
+		args.add("${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['temp_dir']}");
+		args.add("${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['rejected_dir']}");
 		args.add("${control_file_name}");
 		args.add("${lineNumberData}");
 		args.add("${fileTrailerPresent}");
-		args.add("${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['raw_dir']}");
+		args.add("${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['raw_dir']}");
 		
 		
 		jtag.setArg(args);
 		
-		okt.setOkt("RECORD_VALIDATIONS");
-		ert.setErt("CAPTURE_ERROR_LOGS_" + hconf.getHiveTableName());
+		okt.setOkt(ACTION_RECORD_VALIDATIONS);
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
 		actJava.setJtag(jtag);
-		actJava.setName("FILESYSTEM_VALIDATIONS");
+		actJava.setName(ACTION_FILESYSTEM_VALIDATIONS);
 		actJava.setOkt(okt);
 		actJava.setErt(ert);
 		

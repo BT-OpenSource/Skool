@@ -111,12 +111,43 @@ public class DIConfig implements Constants{
 	private String fileTrailerKeyword;
 	private String fileHeaderKeyword;
 	private int lineNumberData;
-	
+	private String interimLandingDir;
+	private String landingDirectory;
 	public DIConfig() {
 		super();
 	}
 	
-	
+
+
+
+	public String getLandingDirectory() {
+		return landingDirectory;
+	}
+
+
+
+
+	public void setLandingDirectory(String landingDirectory) {
+		this.landingDirectory = landingDirectory;
+	}
+
+
+
+
+	public String getInterimLandingDir() {
+		return interimLandingDir;
+	}
+
+
+
+
+	public void setInterimLandingDir(String interimLandingDir) {
+		this.interimLandingDir = interimLandingDir;
+	}
+
+
+
+
 	public String getFileHeaderKeyword() {
 		return fileHeaderKeyword;
 	}
@@ -704,14 +735,14 @@ public class DIConfig implements Constants{
 		
 		Properties properties = null;
 		InputStream ips = null;
-		final String conffileName = "configuration.properties"; 
+		//final String conffileName = "configuration.properties"; 
 		DIConfig confObj = new DIConfig();
 		
 		try {
 			
 			properties = new Properties();
 			//ips = DIConfig.class.getClassLoader().getResourceAsStream(conffileName);
-			ips = new FileInputStream(conffileName);
+			ips = new FileInputStream(CONFIGURATION_PROPERTIES_FILE);
 			properties.load(ips);
 			
 		} catch (Exception e) {
@@ -728,9 +759,9 @@ public class DIConfig implements Constants{
 			}	
 			
 			try{
-				confObj.setInstanceName(properties.getProperty("cluster_haas_instance_name").toUpperCase());
+				confObj.setInstanceName(properties.getProperty("hdfs_instance_name").toUpperCase());
 				}catch(NullPointerException e){
-					logger.error("please provide cluster_haas_instance_name");
+					logger.error("please provide hdfs_instance_name");
 					throw new Error(e);
 				}
 			if("".equals(confObj.getInstanceName())){
@@ -746,7 +777,7 @@ public class DIConfig implements Constants{
 			
 			confObj.setConcurrency(properties.getProperty("concurrency"));
             if(confObj.getConcurrency() == null || "".equals(confObj.getConcurrency())){
-                           logger.info("By default setting concuurency to 1");
+                           logger.info("By default setting concurrency to 1");
                            confObj.setConcurrency("1");
             }
             confObj.setThrottle(properties.getProperty("throttle"));
@@ -849,9 +880,21 @@ public class DIConfig implements Constants{
 				
 				confObj.setHiveJdbcDriver(HIVE_JDBC_DRIVER_NAME);
 				
+				confObj.setInterimLandingDir(properties.getProperty("interim_landing_directory"));
+				String landingDirApp = "";
+				
+				
 			//***************common properties set for both import and export********************//
 			
             if(!confObj.getImport_export_flag().equalsIgnoreCase("3")){
+            	
+            	String interimDir = confObj.getInterimLandingDir();
+				if("".equals(interimDir)){
+					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
+				}else{
+					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+interimDir+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
+				}
+            	confObj.setLandingDirectory(landingDirApp);
 				confObj.setSourceHostName(properties.getProperty("database_host"));
 				if(confObj.getSourceHostName() == null || "".equals(confObj.getSourceHostName())){
 					logger.error("please provide source_database_host");

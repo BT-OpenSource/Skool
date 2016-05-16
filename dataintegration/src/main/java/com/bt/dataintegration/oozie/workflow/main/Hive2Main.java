@@ -1,13 +1,9 @@
 package com.bt.dataintegration.oozie.workflow.main;
 
 import java.util.LinkedList;
-import java.util.List;
 
-import com.bt.dataintegration.constants.Constants;
+import static com.bt.dataintegration.constants.Constants.*;
 import com.bt.dataintegration.oozie.workflow.tags.ActionHive2;
-import com.bt.dataintegration.oozie.workflow.tags.Credential;
-import com.bt.dataintegration.oozie.workflow.tags.CredentialProperty;
-import com.bt.dataintegration.oozie.workflow.tags.Credentials;
 import com.bt.dataintegration.oozie.workflow.tags.ErrorTo;
 import com.bt.dataintegration.oozie.workflow.tags.Hive2Tag;
 import com.bt.dataintegration.oozie.workflow.tags.HiveConfigProperty;
@@ -15,13 +11,12 @@ import com.bt.dataintegration.oozie.workflow.tags.HiveConfiguration;
 import com.bt.dataintegration.oozie.workflow.tags.OkTo;
 import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.HadoopConfig;
-import com.sun.tools.doclets.internal.toolkit.Configuration;
 
 /**
  * @author 609349708
  *	(Abhinav Meghmala)
  */
-public class Hive2Main implements Constants {
+public class Hive2Main {
 
 	//private Credentials creds = new Credentials();
 	private LinkedList<String> param = new LinkedList<String>();
@@ -38,9 +33,9 @@ public class Hive2Main implements Constants {
 	public Hive2Main() {
 		
 		HadoopConfig hconf = new HadoopConfig().getHadoopConfigProperties();
-		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			tableName = hconf.getTableName();
-		} else if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		} else if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			tableName = hconf.getHiveTableName();
 		}
 	}
@@ -84,7 +79,7 @@ public class Hive2Main implements Constants {
 		// +"_ADD_PARTITION.hql");
 		h2tag.setScript("${hiveCreateScript}");
 		
-		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			param.add("targetDirectory=${targetDirectory}");
 			param.add("queueName=${queueName}");
 			param.add("tableName=${tableName}");
@@ -95,7 +90,7 @@ public class Hive2Main implements Constants {
 				param.add("hiveTextColumns=${hiveTextColumns}");
 			}
 		}
-		if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			param.add("queueName=${queueName}");
 			param.add("targetDirectoryValid=${targetDirectoryValid}");
 			//param.add("file_hive_cols=${file_hive_cols}");
@@ -104,9 +99,9 @@ public class Hive2Main implements Constants {
 
 		h2tag.setParams(param);
 		
-		okt.setOkt("HIVE_ADD_PARTITION_" + tableName);
+		okt.setOkt(ACTION_HIVE_ADD_PARTITION);
 		//ert.setErt("EMAIL_FAILURE");
-		ert.setErt("CAPTURE_ERROR_LOGS_" + tableName);
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
 		
 		if(diConf.getEnvDetails().equals("2")) {
 			
@@ -118,7 +113,7 @@ public class Hive2Main implements Constants {
 		actHive.setErt(ert);
 		actHive.setOkt(okt);
 		actHive.setHs2Tag(h2tag);
-		actHive.setName("HIVE_CREATE_TABLE_" + tableName);
+		actHive.setName(ACTION_HIVE_CREATE_TABLE);
 		//actHive.setCred("hive2");
 	
 		return actHive;
@@ -134,11 +129,11 @@ public class Hive2Main implements Constants {
 		//String hiveSiteXMLPath = hconf.getNameNode() + "/user/"+ hconf.getQueueName() + "/" + hconf.getTableName() + "/workspace";
 		
 		String targetDir = "hiveAddPart=${targetDirectory}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirYear']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirMonth']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirDate']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirHour']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirMinute']}";
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirYear']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMonth']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirDate']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirHour']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMinute']}";
 		
 		if(diConf.getEnvDetails().equals("1")) {
 			
@@ -164,33 +159,33 @@ public class Hive2Main implements Constants {
 		//h2tag.setScript(hiveSiteXMLPath + "/" + hconf.getTableName() +"_ADD_PARTITION.hql");
 		h2tag.setScript("${hiveAddPartScript}");
 		
-		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
-			param.add("targetDirYear=${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirYear']}");
-			param.add("targetDirMonth=${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirMonth']}");
-			param.add("targetDirDate=${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirDate']}");
-			param.add("targetDirHour=${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirHour']}");
-			param.add("targetDirMinute=${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirMinute']}");
+		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
+			param.add("targetDirYear=${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirYear']}");
+			param.add("targetDirMonth=${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMonth']}");
+			param.add("targetDirDate=${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirDate']}");
+			param.add("targetDirHour=${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirHour']}");
+			param.add("targetDirMinute=${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMinute']}");
 			param.add("queueName=${queueName}");
 			param.add("tableName=${tableName}");
 			param.add("hiveTableName=${hiveTableName}");
 			param.add("nameNode=${nameNode}");
 			param.add(targetDir);
 		}
-		if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
-			param.add("dir_year=${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_year']}");
-			param.add("dir_month=${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_month']}");
-			param.add("dir_day=${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_day']}");
-			param.add("dir_hour=${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_hour']}");
-			param.add("dir_minute=${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_minute']}");
+		if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
+			param.add("dir_year=${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_year']}");
+			param.add("dir_month=${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_month']}");
+			param.add("dir_day=${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_day']}");
+			param.add("dir_hour=${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_hour']}");
+			param.add("dir_minute=${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_minute']}");
 			param.add("hiveTableName=${hiveTableName}");
-			param.add("hiveAddPart=${targetDirectoryValid}/${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_year']}/${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_month']}/${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_day']}/${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_hour']}/${wf:actionData('CAPTURE_DATE_AND_CREATEDIR')['dir_minute']}");
+			param.add("hiveAddPart=${targetDirectoryValid}/${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_year']}/${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_month']}/${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_day']}/${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_hour']}/${wf:actionData('"+ACTION_CAPTURE_DATE_AND_CREATEDIR+"')['dir_minute']}");
 		}
 		
 		h2tag.setParams(param);
 		
-		okt.setOkt("CAPTURE_AUDIT_LOGS_" + tableName);
+		okt.setOkt(ACTION_CAPTURE_AUDIT_LOGS);
 		//ert.setErt("EMAIL_FAILURE");
-		ert.setErt("CAPTURE_ERROR_LOGS_" + tableName);
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
 		
 		if(diConf.getEnvDetails().equals("2")) {
 			
@@ -202,7 +197,7 @@ public class Hive2Main implements Constants {
 		addPartition.setErt(ert);
 		addPartition.setOkt(okt);
 		addPartition.setHs2Tag(h2tag);
-		addPartition.setName("HIVE_ADD_PARTITION_" + tableName);
+		addPartition.setName(ACTION_HIVE_ADD_PARTITION);
 		//addPartition.setCred("hive2");
 	
 		return addPartition;
@@ -258,13 +253,13 @@ public ActionHive2 setHive2MainCreateAuditTable(HadoopConfig hconf) {
 		h2tag.setParams(param);
 		
 		if(hconf.isHousekeepRequired() && ("1".equalsIgnoreCase(hconf.getImport_export_flag()))) {
-			okt.setOkt("HOUSEKEEPING");
+			okt.setOkt(ACTION_HOUSEKEEPING);
 		} else {
-			okt.setOkt("EMAIL_SUCCESS");
+			okt.setOkt(ACTION_EMAIL_SUCCESS);
 		}
 		
 		//ert.setErt("EMAIL_FAILURE");
-		ert.setErt("CAPTURE_ERROR_LOGS_" + tableName);
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
 		
 		if(diConf.getEnvDetails().equals("2")) {
 			
@@ -276,7 +271,7 @@ public ActionHive2 setHive2MainCreateAuditTable(HadoopConfig hconf) {
 		createAuditTable.setErt(ert);
 		createAuditTable.setOkt(okt);
 		createAuditTable.setHs2Tag(h2tag);
-		createAuditTable.setName("HIVE_CREATE_AUDIT_TABLE_" + tableName);
+		createAuditTable.setName(ACTION_HIVE_CREATE_AUDIT_TABLE);
 		//actHive.setCred("hive2");
 	
 		return createAuditTable;

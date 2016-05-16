@@ -9,6 +9,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import static com.bt.dataintegration.constants.Constants.*;
+
 import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.HadoopConfig;
 
@@ -27,35 +29,28 @@ public class DirectoryHandler {
 
 		cal = Calendar.getInstance();
 		cal.setTime(date);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_YEAR);
 		targetDirYear = sdf.format(date);
 		
-		sdf = new SimpleDateFormat("MM");
+		sdf = new SimpleDateFormat(DATE_FORMAT_MONTH);
 		targetDirMonth = sdf.format(date);
 		
-		targetDirMonthWords= new SimpleDateFormat("MMM").format(cal.getTime());
+		targetDirMonthWords= new SimpleDateFormat(DATE_FORMAT_MONTH_WORDS).format(cal.getTime());
 		
-		sdf = new SimpleDateFormat("dd");
+		sdf = new SimpleDateFormat(DATE_FORMAT_DAY);
 		targetDirDate = sdf.format(date);
 		
-		sdf = new SimpleDateFormat("HH");
+		sdf = new SimpleDateFormat(DATE_FORMAT_HOUR);
 		targetDirHour = sdf.format(date);
 		
-		sdf = new SimpleDateFormat("mm");
+		sdf = new SimpleDateFormat(DATE_FORMAT_MINUTE);
 		targetDirMinute = sdf.format(date);
 }
 	
 public static void createWorkflowPath(DIConfig conf){
 	  int shellout = 1;
-	/*if(conf.getEnvDetails().equalsIgnoreCase("1")){
-		nameNode = NAMENODE;
-	}
-	else
-	{
-		nameNode = NAMENODE_VM;
-	}*/
 	String workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-	String landingDir=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+	String landingDir = conf.getLandingDirectory();
 	String cmd="";
    
 		logger.info("Creating workspace directory");
@@ -108,33 +103,29 @@ public static void createPasswordDirectory(DIConfig conf){
 
 public static void createAuditLogPath(DIConfig conf){
 	logger.info("Creating/Checking Audit log path");
-	boolean isFile = false;
-	if(conf.getImport_export_flag().equals("3")){
-		isFile = true;
-	}
 	String cmd = "hadoop fs -ls "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT";
 	int shellout = 1;
 	shellout = Utility.executeSSH(cmd);
 	if(shellout == 0){
-		cmd = "hadoop fs -ls "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/audit_logs.txt";
+		cmd = "hadoop fs -ls "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
 		shellout = Utility.executeSSH(cmd);
 		if(shellout != 0){
-			cmd = "hadoop fs -touchz "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/audit_logs.txt";
+			cmd = "hadoop fs -touchz "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
 			shellout = Utility.executeSSH(cmd);
-			cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/audit_logs.txt";
+			cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
 			shellout = Utility.executeSSH(cmd);
 		}
 		else{
-			cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/audit_logs.txt";
+			cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
 			shellout = Utility.executeSSH(cmd);
 		}
 	}
 	else{
 		cmd = "hadoop fs -mkdir -p "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT";
 		shellout = Utility.executeSSH(cmd);
-		cmd = "hadoop fs -touchz "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/audit_logs.txt";
+		cmd = "hadoop fs -touchz "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
 		shellout = Utility.executeSSH(cmd);
-		cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/audit_logs.txt";
+		cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
 		shellout = Utility.executeSSH(cmd);
 	}
 }
@@ -145,15 +136,15 @@ public static void sendFileToHDFS(Object obj,String fileName){
 	int flag = 0;
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
-		if(conf.getImport_export_flag().equalsIgnoreCase("1")){
+		if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"/";
 			if(!(fileName.contains("job") || fileName.contains("unix_date")))
 				fileName = conf.getTableName()+"/"+fileName;
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("2")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT/";
 			if(!(fileName.contains("job") || fileName.contains("unix_date")))
 				fileName = conf.getTableName()+"/"+fileName;
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("3")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(FILE_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/";
 			if(!(fileName.contains("job") || fileName.contains("unix_date")))
 				fileName = conf.getHiveTable()+"/"+fileName;
@@ -162,21 +153,26 @@ public static void sendFileToHDFS(Object obj,String fileName){
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
-		if(conf.getImport_export_flag().equalsIgnoreCase("1")){
+		if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"/";
 			if(!(fileName.contains("job") || fileName.contains("unix_date")))
 				fileName = conf.getTableName()+"/"+fileName;
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("2")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT/";
 			if(!(fileName.contains("job") || fileName.contains("unix_date")))
 				fileName = conf.getTableName()+"/"+fileName;
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("3")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(FILE_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTableName()+"/";
 			if(!(fileName.contains("job") || fileName.contains("unix_date")))
 				fileName = conf.getHiveTableName()+"/"+fileName;
 			flag =1;
 		}
 	}
+	
+	if(fileName.contains("/")){
+		workspaceFilename = (fileName.split("\\/"))[1];
+	}
+	
 	String cmd = "hadoop fs -put "+fileName+" "+workspacePath+workspaceFilename;
 	logger.debug("command to store "+workspaceFilename+" file -- " + cmd);
 	int shellout = Utility.executeSSH(cmd);
@@ -208,27 +204,30 @@ public static void givePermissionToHDFSFile(Object obj,String fileName){
 	int flag = 0;
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
-		if(conf.getImport_export_flag().equalsIgnoreCase("1")){
+		if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"/";
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("2")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT/";
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("3")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(FILE_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/";
 			flag =1;
 		}
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
-		if(conf.getImport_export_flag().equalsIgnoreCase("1")){
+		if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"/";
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("2")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT/";
-		}else if(conf.getImport_export_flag().equalsIgnoreCase("3")){
+		}else if(conf.getImport_export_flag().equalsIgnoreCase(FILE_IMPORT)){
 			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTableName()+"/";
 			flag =1;
 		}
 	}
 	//String workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI-"+conf.getSourceName()+"-"+conf.getTableOwner()+"-"+conf.getTableName()+"/";
+	if(fileName.contains("/")){
+		fileName = (fileName.split("\\/"))[1];
+	}
 	String cmd = "hadoop fs -chmod 660 "+workspacePath+fileName;
 	logger.debug("command to give permission to "+fileName+" file -- " + cmd);
 	int shellout = Utility.executeSSH(cmd);
@@ -261,18 +260,18 @@ public static void createNewFile(Object obj,String fileName,String fileContent){
 	int flag = 0;
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
-		if(conf.getImport_export_flag().equalsIgnoreCase("1") || conf.getImport_export_flag().equalsIgnoreCase("2"))
+		if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_IMPORT) || conf.getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT))
 			fileName = conf.getTableName()+"/"+fileName;
-		else if(conf.getImport_export_flag().equalsIgnoreCase("3")){
+		else if(conf.getImport_export_flag().equalsIgnoreCase(FILE_IMPORT)){
 			fileName = conf.getHiveTable()+"/"+fileName;
 			flag =1;
 		}	
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
-		if(conf.getImport_export_flag().equalsIgnoreCase("1") || conf.getImport_export_flag().equalsIgnoreCase("2"))
+		if(conf.getImport_export_flag().equalsIgnoreCase(SQOOP_IMPORT) || conf.getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT))
 			fileName = conf.getTableName()+"/"+fileName;
-		else if(conf.getImport_export_flag().equalsIgnoreCase("3")){
+		else if(conf.getImport_export_flag().equalsIgnoreCase(FILE_IMPORT)){
 			fileName = conf.getHiveTableName()+"/"+fileName;
 			flag =1;
 		}
@@ -317,20 +316,21 @@ public static void cleanUpWorkspace(Object obj){
 	String cmd = "";
 	String jobPropName = "";
 	int shellout =1;
+	
 	logger.info("Cleaning up the workspace directory structure");
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-		landingDir=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+		landingDir=conf.getLandingDirectory();
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
-		jobPropName = conf.getTableName()+"/job.properties";
+		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-		landingDir=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName();
+		landingDir=conf.getLandingDirectory();
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
-		jobPropName = conf.getTableName()+"/job.properties";
+		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	cmd = "hadoop fs -rm -r "+workspacePath;
 	shellout = Utility.executeSSH(cmd);
@@ -374,13 +374,13 @@ public static void cleanUpLanding(Object obj){
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-		landingDir=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName()+"/*";
+		landingDir=conf.getLandingDirectory();
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
-		landingDir=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/landing/staging/"+conf.getSourceName()+"/"+conf.getTableOwner()+"/HDI_"+conf.getTableName()+"/*";
+		landingDir=conf.getLandingDirectory();
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 	}
 	String cmd = "hadoop fs -rm -r "+landingDir;
@@ -417,13 +417,13 @@ public static void cleanUpWorkspaceExport(Object obj){
 		DIConfig conf = (DIConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT";
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
-		jobPropName = conf.getTableName()+"/job.properties";
+		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT";
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
-		jobPropName = conf.getTableName()+"/job.properties";
+		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	cmd = "hadoop fs -rm -r "+workspacePath;
 	shellout = Utility.executeSSH(cmd);
@@ -450,7 +450,7 @@ public static void cleanUpWorkspaceExport(Object obj){
 			out = new PrintWriter(jobPropName);
 			out.println("");
 		} catch (FileNotFoundException e) {
-			logger.error("job.properties file not found");
+			logger.error(JOB_PROP_FILE+" file not found");
 			logger.error("", e);
 		//cleanUpWorkspace(conf);
 		System.exit(0);
@@ -491,8 +491,15 @@ public static void createFileTargetPath(DIConfig conf){
 	String cmd = "hadoop fs -mkdir -p "+fileTargetTemp;
 	int shellout = 1;
 	shellout = Utility.executeSSH(cmd);*/
+	String fileTarget = "";
+	String interimDir = conf.getInterimLandingDir();
+	if("".equals(interimDir)){
+		fileTarget=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/"+conf.getSourceName()+"/HDI_FILE_"+conf.getHiveTable();
+	}else{
+		fileTarget=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/"+interimDir+"/"+conf.getSourceName()+"/HDI_FILE_"+conf.getHiveTable();
+	}
 	
-	String fileTargetValid = "/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/valid_files";
+	String fileTargetValid = fileTarget+"/valid_files";
 	String cmd = "hadoop fs -mkdir -p "+fileTargetValid;
 	int shellout = 1;
 	shellout = Utility.executeSSH(cmd);
@@ -502,7 +509,7 @@ public static void createFileTargetPath(DIConfig conf){
 		throw new Error();
 	}
 	
-	String fileTargetInvalid = "/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/rejected_files";
+	String fileTargetInvalid = fileTarget+"/rejected_files";
 	cmd = "hadoop fs -mkdir -p "+fileTargetInvalid;
 	shellout = 1;
 	shellout = Utility.executeSSH(cmd);
@@ -512,7 +519,7 @@ public static void createFileTargetPath(DIConfig conf){
 		throw new Error();
 	}
 	
-	String fileTargetRaw = "/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/raw";
+	String fileTargetRaw = fileTarget+"/raw";
 	cmd = "hadoop fs -mkdir -p "+fileTargetRaw;
 	shellout = 1;
 	shellout = Utility.executeSSH(cmd);
@@ -522,7 +529,7 @@ public static void createFileTargetPath(DIConfig conf){
 		throw new Error();
 	}
 	
-	String fileTargetArchive = "/user/"+conf.getInstanceName()+"/landing/staging/"+conf.getSourceName()+"/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/archive";
+	String fileTargetArchive = fileTarget+"/archive";
 	cmd = "hadoop fs -mkdir -p "+fileTargetArchive;
 	shellout = 1;
 	shellout = Utility.executeSSH(cmd);
@@ -542,12 +549,12 @@ public static void cleanUpWorkspaceFile(Object obj){
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTable()+"/";
-		jobPropName = conf.getTableName()+"/job.properties";
+		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
 		workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_FILE_"+conf.getSourceName()+"_"+conf.getHiveTableName()+"/";
-		jobPropName = conf.getTableName()+"/job.properties";
+		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	cmd = "hadoop fs -rm -r "+workspacePath;
 	shellout = Utility.executeSSH(cmd);

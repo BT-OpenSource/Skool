@@ -9,6 +9,7 @@ import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.TableProperties;
 import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
+import static com.bt.dataintegration.constants.Constants.*;
 
 public class TestLogic {
 	private DBConnectImpl dbCon = new DBConnectImpl();
@@ -128,9 +129,9 @@ public class TestLogic {
 	protected String getPassword(DIConfig conf){
 		String pwd ="";
 		Properties properties = null;
-		final String conffileName = "password.properties";
+		//final String conffileName = "password.properties";
 		try {
-			properties = Utility.readConfigProperties(conffileName);
+			properties = Utility.readConfigProperties(PASSWORD_FILE);
 
 		} catch (Exception e) {
 			throw new Error(e);

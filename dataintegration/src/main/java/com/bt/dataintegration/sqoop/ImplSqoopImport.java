@@ -36,7 +36,7 @@ public class ImplSqoopImport implements ISqoopImport {
 	 */
 
 	public boolean validateSqoopPropFileAccess() {
-		String conffile = "job.properties";
+		String conffile = JOB_PROP_FILE;
 		if (Utility.readConfigProperties(conffile) != null) {
 			logger.info("able to access prop file");
 			return true;
@@ -74,8 +74,7 @@ public class ImplSqoopImport implements ISqoopImport {
 		//String createCreds = null;				
 		int retval = 0;
 		String sqoopCmd="";
-		String credsFileName = "hdi." + conf.getSourceName() + "." + conf.getTableOwner() + ".pswd";
-		
+		String credsFileName = "hdi_" +conf.getDatabaseHost()+"_"+conf.getSourceName() + "_" + conf.getTableOwner() + ".pswd";
 		if(conf.getSqoopFileFormat().contains("avro")){
 			sqoopCmd="sqoop import "
 					+ SQ_IMPORT_PARAM_CREDS +"="+JCEKS+ "/" + conf.getQueueName() + "/HDI_Password_Repository/"

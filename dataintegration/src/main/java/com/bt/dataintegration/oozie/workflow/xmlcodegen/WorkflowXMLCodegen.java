@@ -8,12 +8,10 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 
 import com.bt.dataintegration.constants.Constants;
-import com.bt.dataintegration.hive.HiveProcessImpl;
 import com.bt.dataintegration.oozie.workflow.main.CredentialsMain;
 import com.bt.dataintegration.oozie.workflow.main.EmailFailureMain;
 import com.bt.dataintegration.oozie.workflow.main.EmailSuccessMain;
 import com.bt.dataintegration.oozie.workflow.main.EndMain;
-import com.bt.dataintegration.oozie.workflow.main.FSMain;
 import com.bt.dataintegration.oozie.workflow.main.GlobalMain;
 import com.bt.dataintegration.oozie.workflow.main.Hive2Main;
 import com.bt.dataintegration.oozie.workflow.main.JavaMain;
@@ -89,14 +87,14 @@ public class WorkflowXMLCodegen implements Constants {
 		global = new GlobalMain().setGlobalMain();
 		creds = new CredentialsMain().setCredentialsMain(hconf);
 		
-		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			sqoopAction = new SqoopMain().setSqoopMain(hconf);
 			housekeeping = new ShellMain().setShellMainHousekeeping(hconf);
-		} else if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		} else if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			javaAction = new JavaMain().setJavaMain(hconf);
 		}
 		startTo = new StartToMain().setStartTo(hconf);
-		fsAction = new FSMain().setFSMain(hconf);
+		//fsAction = new FSMain().setFSMain(hconf);
 		hiveAction = new Hive2Main().setHive2MainHiveCreate(hconf);
 		addPartition = new Hive2Main().setHive2MainPartition(hconf);
 		emailSuccess = new EmailSuccessMain().setEmailSuccessMain(hconf);
@@ -122,9 +120,9 @@ public class WorkflowXMLCodegen implements Constants {
 			logger.info("Generating Oozie workflow.xml...");
 			//File file = new File(hconf.getTableName()+"/workflow.xml");
 			String tableName = null;
-			if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+			if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 				tableName = hconf.getTableName();
-			} else if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
+			} else if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 				tableName = hconf.getHiveTableName();
 			}
 			File file = new File(tableName + "/workflow.xml");

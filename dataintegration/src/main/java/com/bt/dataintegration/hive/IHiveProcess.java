@@ -4,17 +4,6 @@
 
 package com.bt.dataintegration.hive;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
-import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
-import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.thrift.TException;
-
 import com.bt.dataintegration.property.config.HadoopConfig;
 
 public interface IHiveProcess {

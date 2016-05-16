@@ -41,18 +41,18 @@ public class WorkflowMain implements Constants {
 		
 		String tableName = null;
 		
-		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			tableName = hconf.getTableName();
-		} else if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		} else if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			tableName = hconf.getHiveTableName();
 		}
 		
 		String flag = hconf.getImport_export_flag();
 		System.out.println(flag);
-		if("1".equals(flag)) {
-			workflow.setName("HDI_IMPORT_FROM_" + tableName);
-		} else if("3".equals(flag)) {
-			workflow.setName("HDI_FILESYSTEM_IMPORT_" + tableName);
+		if(SQOOP_IMPORT.equals(flag)) {
+			workflow.setName("SKOOL_IMPORT_FROM_" + tableName);
+		} else if(FILE_IMPORT.equals(flag)) {
+			workflow.setName("SKOOL_FILESYSTEM_IMPORT_" + tableName);
 		}
 		workflow.setXmlns(WORKFLOW_XMLNS);
 		workflow.setGlobal(global);
@@ -62,9 +62,9 @@ public class WorkflowMain implements Constants {
 			
 			workflow.setHiveCreds(creds);
 		}	
-		if("1".equals(flag)) {
+		if(SQOOP_IMPORT.equals(flag)) {
 			workflow.setSqImport(sqoopAction);
-		} else if("3".equals(flag)) {
+		} else if(FILE_IMPORT.equals(flag)) {
 			workflow.setJavaFSValidate(javaAct);
 		}
 		workflow.setSt(startTo);
@@ -77,7 +77,7 @@ public class WorkflowMain implements Constants {
 		workflow.setEt(et);
 		//workflow.setJavaSetProp(javaAction);
 		workflow.setPigCompress(pigAction);
-		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 			workflow.setShellRefresh(aShell);
 		}		
 		workflow.setShellInit(shellInit);
@@ -85,7 +85,7 @@ public class WorkflowMain implements Constants {
 		workflow.setCreateAuditTable(createAuditTable);
 		workflow.setShellErr(shellError);
 		
-		if((hconf.isHousekeepRequired() && ("1".equals(flag))) || (hconf.isHousekeepRequired() && ("3".equals(flag)))) {
+		if((hconf.isHousekeepRequired() && (SQOOP_IMPORT.equals(flag))) || (hconf.isHousekeepRequired() && (FILE_IMPORT.equals(flag)))) {
 			workflow.setHousekeeping(housekeeping);
 		}
 		

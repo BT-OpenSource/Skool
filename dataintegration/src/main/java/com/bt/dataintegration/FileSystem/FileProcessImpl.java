@@ -2,7 +2,6 @@ package com.bt.dataintegration.FileSystem;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,7 +13,8 @@ import jline.internal.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.bt.dataintegration.constants.Constants;
+import static com.bt.dataintegration.constants.Constants.*;
+
 import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
@@ -131,11 +131,17 @@ public class FileProcessImpl implements IFileProcess {
 		logger.info("Preparing job.properties");
 		Properties prop = new Properties();
 		OutputStream fout = null;
-		String fileName = "job.properties";
+		//String fileName = "job.properties";
 		StringBuffer colDet = new StringBuffer();
 
 		String workspacePath = "${nameNode}/user/${queueName}/workspace/HDI_FILE_${source_name}_${hiveTableName}";
-		String landingDir = "${nameNode}/user/${queueName}/landing/staging/${source_name}/HDI_FILE_${source_name}_${hiveTableName}";
+		String landingDir = "";
+		String interimDir = conf.getInterimLandingDir();
+		if("".equals(interimDir)){
+			landingDir="${nameNode}/user/${queueName}/${source_name}/HDI_FILE_${hiveTableName}";
+		}else{
+			landingDir="${nameNode}/user/${queueName}/"+interimDir+"/${source_name}/HDI_FILE_${hiveTableName}";
+		}
 
 		LinkedList<String> listMap = new LinkedList<String>();
 		String mappingSheetName = conf.getMappingSheetname();
@@ -172,7 +178,7 @@ public class FileProcessImpl implements IFileProcess {
 		}
 
 		try {
-			fout = new FileOutputStream(fileName);
+			fout = new FileOutputStream(JOB_PROP_FILE);
 
 			prop.setProperty("import_export_flag", conf.getImport_export_flag());
 			prop.setProperty("nameNode", conf.getWorkflowNameNode());
@@ -203,7 +209,7 @@ public class FileProcessImpl implements IFileProcess {
 			prop.setProperty("file_mask", conf.getFileMask());
 			prop.setProperty("delimiter", conf.getFileDelimeter());
 			prop.setProperty("control_file_name", conf.getControlFileName());
-			prop.setProperty("jar_file", Constants.HDI_FILE_VALIDATE_JAR);
+			prop.setProperty("jar_file",HDI_FILE_VALIDATE_JAR);
 			prop.setProperty("jar_file_location",
 					"${wf_application_path}/lib/${jar_file}");
 			prop.setProperty("mapping_details", finalCols);
@@ -212,7 +218,7 @@ public class FileProcessImpl implements IFileProcess {
 
 			// //file scripts
 			prop.setProperty("pig_script_location",
-					"${wf_application_path}/pig_record_validator.pig");
+					"${wf_application_path}/"+PIG_RECORD_VALIDATOR_SCRIPT);
 			prop.setProperty("hiveCreateScript",
 					"${wf_application_path}/HDI_${hiveTableName}_CREATE_TABLE.hql");
 			prop.setProperty("hiveAddPartScript",
@@ -227,17 +233,17 @@ public class FileProcessImpl implements IFileProcess {
 			prop.setProperty("oozie_action_sharelib_for_hive", "hive2");
 			prop.setProperty("oozie_launcher_action_main_class",
 					"org.apache.oozie.action.hadoop.Hive2Main");
-			prop.setProperty("shell_file_init", "capture_date_createdir.sh");
+			prop.setProperty("shell_file_init",CAPTURE_CREATED_DATE_SCRIPT);
 			prop.setProperty("audit_log_file_path",
-					"${nameNode}/user/${queueName}/HDI_AUDIT/audit_logs.txt");
+					"${nameNode}/user/${queueName}/HDI_AUDIT/"+AUDIT_FILE);
 			prop.setProperty("audit_log_path",
 					"${nameNode}/user/${queueName}/HDI_AUDIT");
-			prop.setProperty("audit_shell_file", "audit_logs.sh");
-			prop.setProperty("error_shell_file", "error_logs.sh");
+			prop.setProperty("audit_shell_file", AUDIT_LOG_SCRIPT);
+			prop.setProperty("error_shell_file", ERROR_LOG_SCRIPT);
 			prop.setProperty("audit_table_name", "HDI_AUDIT");
 			prop.setProperty("hive_create_audit_table",
 					"HDI_CREATE_AUDIT_TABLE.hql");
-			String auditTableCols = Constants.HDI_AUDIT_COLS;
+			String auditTableCols = HDI_AUDIT_COLS;
 			prop.setProperty("hdi_audit_table_cols", auditTableCols);
 
 			// file directory paths
@@ -281,7 +287,7 @@ public class FileProcessImpl implements IFileProcess {
 			}
 		}
 
-		DirectoryHandler.sendFileToHDFS(conf, "job.properties");
-		DirectoryHandler.givePermissionToHDFSFile(conf, "job.properties");
+		DirectoryHandler.sendFileToHDFS(conf,JOB_PROP_FILE);
+		DirectoryHandler.givePermissionToHDFSFile(conf,JOB_PROP_FILE);
 	}
 }

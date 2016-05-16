@@ -1,0 +1,121 @@
+##########################################  COMMON PROPERTIES ##########################################
+#1 - RDBMS to Hadoop
+#2 - Hadoop to RDBMS
+#3 - File to Hadoop
+#4 - Hadoop to File
+import_export_file_flag=1
+
+#oracle-1 and Mysql-2
+RDBMS=1
+
+##HADOOP FILE FORMAT ##
+
+#Below are the file formats in which data will be imported
+#1=avro , 2=text , 3=Parquet , 4= RC , 5 = Sequence 
+FileFormat=2
+
+#No of mappers is needed for sqoop import. Can be modified as per need. By default 1 will be used
+no_of_mappers=1
+
+#SOURCE_NAME(or Componentnameservice1 name)
+source_name=BT
+
+##################### DATABASE DETAILS REQUIRED IF  import_export_file_flag is 1 or 2 ###############
+
+# DB LOGIN DETAILS 
+
+database_host=10.154.9.247
+datebase_port=1521
+DBDriver=oracle.jdbc.driver.OracleDriver
+
+# DB TABLE DETAILS 
+
+database_sid_or_servicename=XE
+database_schemaname=HR
+database_username=hr
+database_tablename=EMPLOYEES1
+#Specify comma-separated list of columns from table which needs to be imported else If left blank all the columns will imported
+user_selected_columns=
+
+### IMPORT PARAMETERS ###
+#Needed if number of mappers is left blank(not set)
+split_by_column=
+#Needed by sqoop for incremental import should be a date column which capture the last updated date If left blank full table will be imported each every time
+last_modified_date_column=
+
+
+### EXPORT PARAMETERS ###
+
+#HDFS source path for the export.   
+export_dir=
+#Anchor column to use for updates. Use a comma separated list of columns if there are more than one column.   
+update_key_column=
+#Specify how updates are performed when new rows are found with non-matching keys in database.Legal values for mode include updateonly (default) and allowinsert.   
+update_mode=
+columns_name= 
+#The table in which data will be staged before being inserted into the destination table.
+staging_table=
+
+########################### FILE SYSTEM DETAILS REQUIRED IF  import_export_file_flag is 3 or 4 #########
+#The base directory where the input files exists
+file_base_directory=
+#The delimiter that separates fields in the file
+file_delimiter=
+# The table name for the files in cluster
+file_hive_table_name=
+# The control file name that indicates successful transmission of the file
+control_file_name=
+# The name of the mapping sheet that contains the column name and the data type of each column
+mapping_sheet_name=
+# The pattern to identify which files to be processed
+file_mask=
+# The date format of the date fields in the files. If this field is blank, default date format will be take as yyyy-MM-dd HH:mm:ss
+file_date_format=
+# The line number in the file from which the actual records start to skip the header.
+line_number=
+# An indicator if the file trailer is present
+file_trailer_present=
+# If the file trailer is present,  keyword to identify the file trailer
+file_trailer_keyword=
+file_header_keyword=
+
+########################################## HADOOP DETAILS ##########################################
+#1 for cluster (as it will be authenticated for Kerberos) and 2 for VM (no kerberos required) Effected elements will be Hive2 JDBC URL in Oozie + sharelib/main class in Hive oozie action
+Environment_Details=1
+#Will be used in place of hdfs://nameservice1 for hdfs directory operations while applications runs in gateway node
+NameNode=hdfs://nameservice1
+#Part taken from beeline connector while logging into cluster 
+#Sample (from 1a) - !connect jdbc:hive2://tplhc01c002:10000/default;principal=hive/tplhc01c002.iuser.iroot.adidom.com@IUSER.IROOT.ADIDOM.COM
+hive2_jdbc_url=jdbc:hive2://tplcldera17:10000/
+#Can be obtained from hive-site.xml in tag - hive.server2.authentication.kerberos.principal
+hive2_server_principal=hive/_HOST@IUSER.IROOT.ADIDOM.COM
+jobTracker=yarnRM
+#Instance to which user has access to in cluster
+hdfs_instance_name=HAASCT544_01
+interim_landing_directory=landing/staging
+
+########################################## COORDINATOR DETAILS ##########################################
+# Is coordinator required or you want to run it only once
+coordinator_required=false
+#Start and End time to be used in Coordinator for scheduling Oozie Jobs
+#w3c date-time Format: yyyy-mm-ddThh:MMZ
+workflow_start_time=2016-05-03T04:00Z
+workflow_end_time=2017-01-01T00:30Z
+#Time Zone can be changed as per usage
+time_zone=Europe/London
+concurrency=1
+throttle=1
+timeout=0
+# frequency to be provided in minutes(1440 mins= 1 day)
+frequency=1440
+
+
+########################################## HOUSEKEEPING DETAILS ##########################################
+# User should specify the retention period for raw_data in number of days.
+retention_period_raw_data=
+
+
+########################################## LOGGING DETAILS ##########################################
+#Email address to which Oozie Success/Failure alerts will go to
+success_email_id=someone@bt.com
+failure_email_id=someone@bt.com

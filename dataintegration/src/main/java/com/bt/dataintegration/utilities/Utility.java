@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-
+import static com.bt.dataintegration.constants.Constants.*;
 
 public class Utility {
 	final static Logger logger = Logger.getLogger(Utility.class);
@@ -69,7 +69,6 @@ public class Utility {
 	
 	
 	public static Properties readConfigProperties(String confFileName ) {
-        //System.out.println(confFileName);    
     	Properties properties = new Properties();
 		try {
 			
@@ -77,10 +76,9 @@ public class Utility {
 		return properties;
 		
 	} catch (Exception e) {
-		
-		System.out.println("Error loading properties");
-		//e.printStackTrace();
-		return null;
+		logger.error("Error loading properties");
+		logger.error(e);
+		throw new Error(e);
 	}
 	
 }
@@ -93,7 +91,7 @@ public class Utility {
         while(iterator.hasNext()) {
                        
                        String values = iterator.next();
-                       String[] tokens = values.split("\\^\\^",-1);
+                       String[] tokens = values.split(MAPPING_SHEET_DELIMITER,-1);
                        String dtNew = map(tokens[1]);
                        if(tokens.length == 3){
                     	   mappedCols = mappedCols + tokens[0] + " " + dtNew + ",";
@@ -185,7 +183,7 @@ public static Map<String, String> getMappedTable(LinkedHashMap<String, List<Stri
 				try{
 				precDet = precision.split(",");
 				}catch(NullPointerException e){
-					hiveMappedTable.put(oraTable.getKey(), "INT");
+					hiveMappedTable.put(oraTable.getKey(), "BIGINT");
 					continue;
 				}
 				int datTyp = Integer.parseInt(precDet[0]);
@@ -211,7 +209,7 @@ public static Map<String, String> getMappedTable(LinkedHashMap<String, List<Stri
 					{
 						hiveMappedTable.put(oraTable.getKey(), "SMALLINT");
 					}
-					else if(datTyp >2 && datTyp <6)
+					else if(datTyp >2 && datTyp <=5)
 					{
 						hiveMappedTable.put(oraTable.getKey(), "INT");
 					}

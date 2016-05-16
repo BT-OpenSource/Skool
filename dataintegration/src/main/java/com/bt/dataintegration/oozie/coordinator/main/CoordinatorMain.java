@@ -14,7 +14,7 @@ public class CoordinatorMain {
 		coord.setControls(controls);
 		coord.setEnd("${end}");
 		coord.setFrequency("${frequency}");
-		coord.setName("COORDINATOR_FOR_DATA_IMPORT_FROM_" + hconf.getTableName());
+		coord.setName("SKOOL_COORDINATOR_FOR_IMPORT_FROM_" + hconf.getTableName());
 		coord.setStart("${start}");
 		coord.setTimezone("${timezone}");
 		coord.setXmlns("uri:oozie:coordinator:0.2");

@@ -3,7 +3,8 @@ package com.bt.dataintegration.oozie.workflow.main;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import com.bt.dataintegration.constants.Constants;
+import static com.bt.dataintegration.constants.Constants.*;
+
 import com.bt.dataintegration.oozie.workflow.tags.ActionSqoopImport;
 import com.bt.dataintegration.oozie.workflow.tags.ErrorTo;
 import com.bt.dataintegration.oozie.workflow.tags.GlobalConfiguration;
@@ -16,7 +17,7 @@ import com.bt.dataintegration.property.config.HadoopConfig;
  * @author 609349708
  *	(Abhinav Meghmala)
  */
-public class SqoopMain implements Constants {
+public class SqoopMain{
 
 	private SqoopImport sqoopImport = new SqoopImport();
 	private ActionSqoopImport actSqoop = new ActionSqoopImport();
@@ -30,14 +31,14 @@ public class SqoopMain implements Constants {
 	public ActionSqoopImport setSqoopMain(HadoopConfig hconf) {
 		
 		int flag = 0;
-		String whereClause = "${lastModifiedDateColumn} >= to_date('${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['lowerBound']}','DD-MON-YYYY HH24:MI') "
-				+ "and ${lastModifiedDateColumn} < to_date('${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['upperBound']}','DD-MON-YYYY HH24:MI')";
+		String whereClause = "${lastModifiedDateColumn} >= to_date('${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['lowerBound']}','DD-MON-YYYY HH24:MI:SS') "
+				+ "and ${lastModifiedDateColumn} < to_date('${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['upperBound']}','DD-MON-YYYY HH24:MI:SS')";
 		String sqoopTargetDir = "${targetDirectory}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirYear']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirMonth']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirDate']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirHour']}/"
-				+ "${wf:actionData('REFRESH_LAST_MODIFIED_DATE_VALUE')['targetDirMinute']}";
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirYear']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMonth']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirDate']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirHour']}/"
+				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMinute']}";
 		
 		if(hconf.getDirectMode().equalsIgnoreCase("true")) {
 			flag = 1;
@@ -99,11 +100,11 @@ public class SqoopMain implements Constants {
 		
 		//okt.setOkt("COMPRESS_AVRO_DATA_FOR_" + hconf.getTableName());
 		//okt.setOkt("REFRESH_LAST_MODIFIED_DATE_VALUE_FILE");
-		okt.setOkt("COMPRESS_AVRO_DATA_FOR_" + hconf.getTableName());
+		okt.setOkt(ACTION_PIG_COMPRESS);
 		//ert.setErt("EMAIL_FAILURE");
-		ert.setErt("CAPTURE_ERROR_LOGS_" + hconf.getTableName());
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
 		
-		actSqoop.setName("SQOOP_IMPORT_FROM_" + hconf.getTableName());
+		actSqoop.setName(ACTION_SQOOP_IMPORT);
 		actSqoop.setSqImport(sqoopImport);
 		actSqoop.setOkTo(okt);
 		actSqoop.setErrorTo(ert);

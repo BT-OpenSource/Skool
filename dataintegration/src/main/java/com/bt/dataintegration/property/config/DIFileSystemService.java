@@ -1,28 +1,16 @@
 package com.bt.dataintegration.property.config;
 
-import java.io.BufferedReader;
-import java.io.File;
+import static com.bt.dataintegration.constants.Constants.*;
+
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-
-import jline.internal.InputStreamReader;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.bt.dataintegration.FileSystem.FileProcessImpl;
 import com.bt.dataintegration.FileSystem.IFileProcess;
-import com.bt.dataintegration.database.DBConnectImpl;
 import com.bt.dataintegration.hive.HiveProcessImpl;
 import com.bt.dataintegration.oozie.coordinator.xmlcodegen.CoordinatorXMLCodegen;
 import com.bt.dataintegration.oozie.workflow.xmlcodegen.WorkflowXMLCodegen;
@@ -39,13 +27,13 @@ public class DIFileSystemService {
 		Properties p = new Properties();
 
 		try {
-		    p.load(new FileInputStream(log4JPropertyFile));
-		    PropertyConfigurator.configure(p);
-		   // logger.info("Wow! I'm configured!");
+			p.load(new FileInputStream(LOG4J_PROPERTY_FILE));
+			PropertyConfigurator.configure(p);
 		} catch (IOException e) {
-		    logger.error("log4j.properties file not found");
+			logger.error(LOG4J_PROPERTY_FILE + " file not found");
 
 		}
+		
 		DIConfig servConf = null;
 		try {
 			
@@ -87,7 +75,7 @@ public class DIFileSystemService {
 				throw new Error();
 			}	
 			
-			cmd = "hadoop fs -put file-validations-v1.jar " + workspacePath+"lib";
+			cmd = "hadoop fs -put "+FILE_VALIDATIONS_JAR+" " + workspacePath+"lib";
 			shellout = 1;
 			shellout = Utility.executeSSH(cmd);
 			if(shellout !=0){
@@ -104,10 +92,10 @@ public class DIFileSystemService {
 				ccodegen.generateXML(conf);
 			}
 			
-			cmd = "mv job.properties "+servConf.getHiveTable()+"/job.properties";
+			cmd = "mv "+JOB_PROP_FILE+" "+servConf.getHiveTable()+"/"+JOB_PROP_FILE;
 			Utility.executeSSH(cmd);
 			 
-			cmd = "cp configuration.properties "+servConf.getHiveTable()+"/configuration.properties";
+			cmd = "cp "+CONFIGURATION_PROPERTIES_FILE+" "+servConf.getHiveTable()+"/configuration.properties";
 			Utility.executeSSH(cmd); 
 			
 			cmd = "cp "+servConf.getMappingSheetname()+" "+servConf.getHiveTable()+"/"+servConf.getMappingSheetname();

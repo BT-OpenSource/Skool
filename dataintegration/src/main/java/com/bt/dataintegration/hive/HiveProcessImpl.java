@@ -4,46 +4,19 @@
 
 package com.bt.dataintegration.hive;
 
-import java.beans.Statement;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import jline.internal.InputStreamReader;
 
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.TableType;
-import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
-import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
-import org.apache.hadoop.hive.metastore.api.SerDeInfo;
-import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
-import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.serde2.avro.AvroSerDe;
-import org.apache.log4j.Logger;
-import org.apache.thrift.TException;
 
+import org.apache.log4j.Logger;
 import com.bt.dataintegration.constants.Constants;
-import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.HadoopConfig;
 import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
@@ -202,9 +175,7 @@ public class HiveProcessImpl implements IHiveProcess, Constants {
 
 	public String queryBuilder(HadoopConfig hconf) {
 		
-		String hiveDirectory = "/user/" + hconf.getQueueName() + "/landing/staging/"
-				+ hconf.getSourceName()+"/"+ hconf.getTableOwner()+"/HDI_"
-				+ hconf.getTableName();
+		String hiveDirectory = hconf.getLandingDirectory();
 		String query = "";
 		if(hconf.getSqoopFileFormat().contains("avro")){
 			query = "create external table if not exists " + hconf.getQueueName() + "."
@@ -261,7 +232,7 @@ public class HiveProcessImpl implements IHiveProcess, Constants {
 
 	public void writeHiveCreateQuery(String query, HadoopConfig hconf) {
 
-		hiveCreateQuery = "HDI_"+hconf.getTableName() + "_CREATE_AVRO_TABLE.hql";
+		hiveCreateQuery = "HDI_"+hconf.getTableName() + "_CREATE_TABLE.hql";
 		File file = new File(hconf.getTableName()+"/"+hiveCreateQuery);
 		PrintWriter writer = null;
 		try {

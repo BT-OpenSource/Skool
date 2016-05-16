@@ -15,10 +15,9 @@ import com.bt.dataintegration.oozie.coordinator.tags.Action;
 import com.bt.dataintegration.oozie.coordinator.tags.Controls;
 import com.bt.dataintegration.oozie.coordinator.tags.Coordinator;
 import com.bt.dataintegration.oozie.coordinator.tags.Workflow;
-import com.bt.dataintegration.oozie.workflow.xmlcodegen.WorkflowXMLCodegen;
 import com.bt.dataintegration.property.config.HadoopConfig;
 import com.bt.dataintegration.utilities.DirectoryHandler;
-import com.bt.dataintegration.utilities.Utility;
+import static com.bt.dataintegration.constants.Constants.*;
 
 public class CoordinatorXMLCodegen {
 
@@ -34,14 +33,14 @@ public class CoordinatorXMLCodegen {
 		
 		try {
 
-			logger.info("Generating Oozie coordinator.xml...");
+			logger.info("Generating Oozie "+COORDINATOR_XML_FILE+"...");
 			String tableName = null;
-			if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+			if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 				tableName = hconf.getTableName();
-			} else if("3".equalsIgnoreCase(hconf.getImport_export_flag())) {
+			} else if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
 				tableName = hconf.getHiveTableName();
 			}
-			File file = new File(tableName +"/coordinator.xml");
+			File file = new File(tableName +"/"+COORDINATOR_XML_FILE);
 			JAXBContext jaxbContext = JAXBContext
 					.newInstance(Coordinator.class);
 			javax.xml.bind.Marshaller jaxbMarshaller = jaxbContext
@@ -55,8 +54,8 @@ public class CoordinatorXMLCodegen {
 			//jaxbMarshaller.marshal(workflow, System.out);			
 			logger.info("coordinator.xml generated !");
 			
-			DirectoryHandler.sendFileToHDFS(hconf, "coordinator.xml");
-			DirectoryHandler.givePermissionToHDFSFile(hconf, "coordinator.xml");
+			DirectoryHandler.sendFileToHDFS(hconf, COORDINATOR_XML_FILE);
+			DirectoryHandler.givePermissionToHDFSFile(hconf, COORDINATOR_XML_FILE);
 			
 		} catch (JAXBException e) {
 			logger.error("Error generating XML for oozie Workflow", e);

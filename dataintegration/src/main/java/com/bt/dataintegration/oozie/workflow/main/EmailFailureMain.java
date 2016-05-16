@@ -1,6 +1,6 @@
 package com.bt.dataintegration.oozie.workflow.main;
 
-import com.bt.dataintegration.constants.Constants;
+import static com.bt.dataintegration.constants.Constants.*;
 import com.bt.dataintegration.oozie.workflow.tags.ActionEmailNotification;
 import com.bt.dataintegration.oozie.workflow.tags.EmailNotification;
 import com.bt.dataintegration.oozie.workflow.tags.ErrorTo;
@@ -10,7 +10,7 @@ import com.bt.dataintegration.oozie.workflow.tags.OkTo;
  * @author 609349708
  *	(Abhinav Meghmala)
  */
-public class EmailFailureMain implements Constants {
+public class EmailFailureMain{
 
 	private EmailNotification notifyFailure = new EmailNotification();
 	private ActionEmailNotification actFailure = new ActionEmailNotification();
@@ -29,10 +29,10 @@ public class EmailFailureMain implements Constants {
 		notifyFailure.setEmailTo("${failure_emails}");
 		notifyFailure.setSubject(emailSubject);
 		
-		okt.setOkt("end");
+		okt.setOkt("kill");
 		ert.setErt("kill");
 		
-		actFailure.setName("EMAIL_FAILURE");
+		actFailure.setName(ACTION_EMAIL_FAILURE);
 		actFailure.setEmn(notifyFailure);
 		actFailure.setOkt(okt);
 		actFailure.setErt(ert);

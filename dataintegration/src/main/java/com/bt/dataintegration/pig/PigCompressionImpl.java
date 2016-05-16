@@ -29,10 +29,7 @@ public class PigCompressionImpl implements IPigCompression{
 		}
 		String pigCmd = "set mapred.child.java.opts "+MAPRED_CHILD_JAVA_OPTS+"; \nset output.compression.enabled true; \nset output.compression.codec "+OUTPUT_COMPRESSION_CODEC+"; \n"
 				+ "raw_equipment = load '" + conf.getTargetDirectory()+"' USING "+fileFormat+";\n"
-				+"store raw_equipment into '" + conf.getAppNameNode()
-				+ "/user/" + conf.getQueueName() + "/landing/staging/"
-				+ conf.getSourceName()+"/"+ conf.getTableOwner()+"/HDI_"
-				+ conf.getTableName()+"/temp' USING "+fileFormat+"; \n";
+				+"store raw_equipment into '"+conf.getLandingDirectory()+"/temp' USING "+fileFormat+"; \n";
 		
 		logger.debug("pig command to compress data ---" +pigCmd);
 		
