@@ -43,20 +43,22 @@ And of course Skool itself is open source with a [public repository][Skool]
  mkdir libs
  mkdir configuration
  git clone [git-repo-url]
- cd Skool/dataintegration
+ cd Skool/dataintegration/configuration
 
-edit the configuration.properties.template and password.properties.template and rename it to configuration.properties and password.properties
+**edit the configuration.properties.template and password.properties.template and rename it to configuration.properties and password.properties**
 
-you need to get ojdbv6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory
+**you need to get ojdbv6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory**
 
+cd ..
 mvn install
 cp target/libs/* ../../libs
 cp target/dataintegration-0.0.1-SNAPSHOT.jar ../../
 cd ../..
 
-copy the configuration.properties edited earlier to the directory skool_tool/configuration/
+**copy the configuration.properties edited earlier to the directory skool_tool/configuration/  
 
 cp Skool/di_tool_runnable/* configuration/
+mv configuration/run.sh .
 sh run.sh 
 ```
 #### License
@@ -68,8 +70,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-
-
- 

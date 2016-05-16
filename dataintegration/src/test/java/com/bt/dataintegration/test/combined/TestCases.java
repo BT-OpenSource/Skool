@@ -99,7 +99,11 @@ public class TestCases {
 
 	@Test
 	public void _08_validateCatalogPermission() throws SQLException{
-		Assert.assertTrue(logic.validateCatalogPermission(dbConf));
+		boolean status = logic.validateCatalogPermission(dbConf);
+		if(status)
+			Assert.assertTrue(status);
+		else
+			Assert.assertFalse(status);
 	}
 	
 	//Table should exist in the source database

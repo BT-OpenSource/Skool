@@ -38,6 +38,8 @@ public class PigCompressionImpl implements IPigCompression{
   		pigCmd = "pig "+"-Dmapred.job.queue.name="+conf.getQueueName()+ " "+conf.getTableName()+"/pigCompress.pig";
   		shellout = Utility.executeSSH(pigCmd);
   		if(shellout !=0){
+  			DirectoryHandler.cleanUpLanding(conf);
+  			DirectoryHandler.cleanUpWorkspace(conf);
 			throw new Error();
 		}
 
@@ -50,6 +52,8 @@ public class PigCompressionImpl implements IPigCompression{
 		logger.debug("command to store pigCompress.pig file -- " + cmd);
 		shellout = Utility.executeSSH(cmd);
 		if(shellout !=0){
+			DirectoryHandler.cleanUpLanding(conf);
+  			DirectoryHandler.cleanUpWorkspace(conf);
 			throw new Error();
 		}
 		
@@ -66,6 +70,8 @@ public class PigCompressionImpl implements IPigCompression{
 		logger.debug("command to avro schema file to HDFS --" + cmd);
 		shellout = Utility.executeSSH(cmd);
 		if(shellout !=0){
+			DirectoryHandler.cleanUpLanding(conf);
+  			DirectoryHandler.cleanUpWorkspace(conf);
 			throw new Error();
 		}
 	}
@@ -83,6 +89,8 @@ public class PigCompressionImpl implements IPigCompression{
 		logger.info("Getting AVRO file...\n" + hadoopGetAvroFile);
 		shellout = Utility.executeSSH(hadoopGetAvroFile);
 		if(shellout !=0){
+			DirectoryHandler.cleanUpLanding(conf);
+  			DirectoryHandler.cleanUpWorkspace(conf);
 			throw new Error();
 		}
 		//String cmd ="avro-tools getschema "+conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/"+conf.getTableName()+"/landing/uncompressed_data/part-m-00000.avro";
