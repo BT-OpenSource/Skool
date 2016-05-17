@@ -18,22 +18,22 @@ FileFormat=2
 no_of_mappers=1
 
 #SOURCE_NAME(or Componentnameservice1 name)
-source_name=BT
+source_name=<your source name>
 
 ##################### DATABASE DETAILS REQUIRED IF  import_export_file_flag is 1 or 2 ###############
 
 # DB LOGIN DETAILS 
 
-database_host=10.154.9.247
-datebase_port=1521
+database_host=<source database host/IP>
+datebase_port=<source database port number>
 DBDriver=oracle.jdbc.driver.OracleDriver
 
 # DB TABLE DETAILS 
 
-database_sid_or_servicename=XE
-database_schemaname=HR
-database_username=hr
-database_tablename=EMPLOYEES1
+database_sid_or_servicename=<source database service name Eg. XE for Oracle 10g>
+database_schemaname=<name of the schema>
+database_username=<username of the schema>
+database_tablename=<name of the source table>
 #Specify comma-separated list of columns from table which needs to be imported else If left blank all the columns will imported
 user_selected_columns=
 
@@ -82,16 +82,17 @@ file_header_keyword=
 ########################################## HADOOP DETAILS ##########################################
 #1 for cluster (as it will be authenticated for Kerberos) and 2 for VM (no kerberos required) Effected elements will be Hive2 JDBC URL in Oozie + sharelib/main class in Hive oozie action
 Environment_Details=1
-#Will be used in place of hdfs://nameservice1 for hdfs directory operations while applications runs in gateway node
-NameNode=hdfs://nameservice1
+NameNode=<your namenode>
 #Part taken from beeline connector while logging into cluster 
-#Sample (from 1a) - !connect jdbc:hive2://tplhc01c002:10000/default;principal=hive/tplhc01c002.iuser.iroot.adidom.com@IUSER.IROOT.ADIDOM.COM
-hive2_jdbc_url=jdbc:hive2://tplcldera17:10000/
+#URL format - jdbc:hive2://zookeeper_quorum|hs2_host:10000/
+#Example (as per CDH5.5 ) jdbc:hive2:quickstart.cloudera//:10000/
+hive2_jdbc_url=jdbc:hive2:<zookeeper_quorum | hs2_host>//:10000/
 #Can be obtained from hive-site.xml in tag - hive.server2.authentication.kerberos.principal
-hive2_server_principal=hive/_HOST@IUSER.IROOT.ADIDOM.COM
-jobTracker=yarnRM
+hive2_server_principal=<hs2 principal value>
+#jobtracker can be found in oozie configuration settings for oozie.service.HadoopAccessorService.jobTracker.whitelist
+jobTracker=<your job tracker name>
 #Instance to which user has access to in cluster
-hdfs_instance_name=HAASCT544_01
+hdfs_instance_name=<instance name>
 interim_landing_directory=landing/staging
 
 ########################################## COORDINATOR DETAILS ##########################################
