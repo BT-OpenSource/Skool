@@ -85,8 +85,8 @@ Environment_Details=1
 NameNode=<your namenode>
 #Part taken from beeline connector while logging into cluster 
 #URL format - jdbc:hive2://zookeeper_quorum|hs2_host:10000/
-#Example (as per CDH5.5 ) jdbc:hive2:quickstart.cloudera//:10000/
-hive2_jdbc_url=jdbc:hive2:<zookeeper_quorum | hs2_host>//:10000/
+#Example (as per CDH5.5 ) jdbc:hive2://quickstart.cloudera:10000/
+hive2_jdbc_url=jdbc:hive2://<zookeeper_quorum | hs2_host>:10000/
 #Can be obtained from hive-site.xml in tag - hive.server2.authentication.kerberos.principal
 hive2_server_principal=<hs2 principal value>
 #jobtracker can be found in oozie configuration settings for oozie.service.HadoopAccessorService.jobTracker.whitelist
