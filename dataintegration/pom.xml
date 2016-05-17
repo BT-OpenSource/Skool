@@ -4,75 +4,100 @@
 	<groupId>com.bt.dataintegration</groupId>
 	<artifactId>dataintegration</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	
+	<properties>
+		  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		  <hive.metastore.version>1.2.1</hive.metastore.version>
+		  <junit.version>4.11</junit.version>
+		  <junit.scope>test</junit.scope>
+		  <log4j.version>1.2.16</log4j.version>
+		  <hive.jdbc.version>1.1.0-cdh5.5.0</hive.jdbc.version>
+		  <commons.cli.version>1.2</commons.cli.version>
+		  <ojdbc.version>11.2.0.3</ojdbc.version>
+		  <hadoop.core.version>2.6.0-mr1-cdh5.5.0</hadoop.core.version>
+		  <hadoop.core.scope>provided</hadoop.core.scope>
+		  <hadoop.common.version>2.6.0-cdh5.5.0</hadoop.common.version>
+		  <hadoop.common.scope>provided</hadoop.common.scope>
+		  <sqoop.version>1.4.6-cdh5.5.0</sqoop.version>
+		  <sqoop.scope>provided</sqoop.scope>
+		  <jaxb.api.version>2.2.12</jaxb.api.version>
+		  <avro.version>1.8.0</avro.version>
+		  <maven.jar.plugin.version>2.4</maven.jar.plugin.version>
+		  <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
+		  <maven.dependency.plugin.version>2.5.1</maven.dependency.plugin.version>
+		  <maven.compiler.plugin.configuration.source>1.7</maven.compiler.plugin.configuration.source>
+		  <maven.compiler.plugin.configuration.target>1.7</maven.compiler.plugin.configuration.target>
+		  <maven.compiler.plugin.configuration.encoding>UTF-8</maven.compiler.plugin.configuration.encoding>
+    </properties>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>org.apache.hive</groupId>
 			<artifactId>hive-metastore</artifactId>
-			<version>1.2.1</version>
+			<version>${hive.metastore.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
+			<version>${junit.version}</version>
+			<scope>${junit.scope}</scope>
 		</dependency>
 
 		<dependency>
 			<artifactId>log4j</artifactId>
 			<groupId>log4j</groupId>
-			<version>1.2.16</version>
+			<version>${log4j.version}</version>
 		</dependency>
 
 		<dependency>
 			<artifactId>hive-jdbc</artifactId>
 			<groupId>org.apache.hive</groupId>
-			<version>1.1.0-cdh5.5.0</version>
+			<version>${hive.jdbc.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
-			<version>1.2</version>
+			<version>${commons.cli.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.3</version>
+			<version>${ojdbc.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-core</artifactId>
-			<version>2.6.0-mr1-cdh5.5.0</version>
-			<scope>provided</scope>
+			<version>${hadoop.core.version}</version>
+			<scope>${hadoop.core.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>
-			<version>2.6.0-cdh5.5.0</version>
-			<scope>provided</scope>
+			<version>${hadoop.common.version}</version>
+			<scope>${hadoop.common.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.sqoop</groupId>
 			<artifactId>sqoop</artifactId>
-			<version>1.4.6-cdh5.5.0</version>
-			<scope>provided</scope>
+			<version>${sqoop.version}</version>
+			<scope>${sqoop.scope}</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.2.12</version>
+			<version>${jaxb.api.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.avro</groupId>
 			<artifactId>avro-tools</artifactId>
-			<version>1.8.0</version>
+			<version>${avro.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -102,7 +127,7 @@
 		<repository>
 			<id>codelds</id>
 			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
-		</repository>
+		</repository>				
 
 		<repository>
 			<id>central</id>
@@ -120,7 +145,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>${maven.jar.plugin.version}</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -134,17 +159,17 @@
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <encoding>UTF-8</encoding>
+                    <source>${maven.compiler.plugin.configuration.source}</source>
+                    <target>${maven.compiler.plugin.configuration.target}</target>
+                    <encoding>${maven.compiler.plugin.configuration.encoding}</encoding>
                 </configuration>
             </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>${maven.dependency.plugin.version}</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -160,5 +185,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
