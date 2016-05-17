@@ -45,7 +45,7 @@ And of course Skool itself is open source with a [public repository][Skool]
  git clone [git-repo-url]
  cd Skool/dataintegration/configuration
 
-**edit the configuration.properties.template and password.properties.template and rename it to configuration.properties and password.properties**
+**edit the configuration.properties.template, password.properties.template and log4j.properties.template and rename it to configuration.properties, password.properties and log4j.properties. For editing configuration.properties file as per your cluster specifications follow the comments in the template file (configuration.properties.template)**
 
 **you need to get ojdbc6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory**
 
