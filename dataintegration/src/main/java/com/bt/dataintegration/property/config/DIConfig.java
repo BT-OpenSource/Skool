@@ -881,6 +881,10 @@ public class DIConfig implements Constants{
 				confObj.setHiveJdbcDriver(HIVE_JDBC_DRIVER_NAME);
 				
 				confObj.setInterimLandingDir(properties.getProperty("interim_landing_directory"));
+				if(confObj.getInterimLandingDir() == null){
+					logger.error("Please provide interim_landing_directory");
+					throw new Error();
+				}
 				String landingDirApp = "";
 				
 				
@@ -888,13 +892,7 @@ public class DIConfig implements Constants{
 			
             if(!confObj.getImport_export_flag().equalsIgnoreCase("3")){
             	
-            	String interimDir = confObj.getInterimLandingDir();
-				if("".equals(interimDir)){
-					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
-				}else{
-					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+interimDir+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
-				}
-            	confObj.setLandingDirectory(landingDirApp);
+            	
 				confObj.setSourceHostName(properties.getProperty("database_host"));
 				if(confObj.getSourceHostName() == null || "".equals(confObj.getSourceHostName())){
 					logger.error("please provide source_database_host");
@@ -1032,7 +1030,13 @@ public class DIConfig implements Constants{
 		        		confObj.setRetentionProcessedData(-1);
 		        	}
 	            }*/
-	            
+				String interimDir = confObj.getInterimLandingDir();
+				if("".equals(interimDir)){
+					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
+				}else{
+					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+interimDir+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
+				}
+            	confObj.setLandingDirectory(landingDirApp);
 	            
 				//properties only for import
 				if(confObj.getImport_export_flag().equalsIgnoreCase("1")){
