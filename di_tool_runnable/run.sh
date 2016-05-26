@@ -24,11 +24,13 @@ then
 		
 		if [  -z "$pwd_date" ]
 		then
-			echo $'\n'"Enter your source database password - (please wait for the prompt...)"
+			echo $'\n'
+			echo "Enter your source database password - (please wait for the prompt...)"
 			hadoop credential create $pwd_alias -provider $pwd_dir
 			java -cp dataintegration-0.0.1-SNAPSHOT.jar:configuration/ojdbc6-11.2.0.3.jar:/opt/cloudera/parcels/CDH/jars/* com.bt.dataintegration.property.config.DIConfigService $pwd
 		else
-			echo $'\n'"This password was last updated on - $pwd_date"
+			echo $'\n'
+			echo "This password was last updated on - $pwd_date"
 			echo "Do you wish to change it ? (y/n)"
 			
 			read opt
