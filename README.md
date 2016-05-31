@@ -10,6 +10,20 @@ This tool takes a property/configuration file as input from the user and runs th
 -	Generates all required files and pushes them to HDFS.
 -	Generates a workflow to be scheduled in Oozie.
 
+#### Problem Statement:
+With increased adoption of big data comes the challenge of integrating existing data sitting in various relational and file based systems with the big data and Hadoop infrastructure. There are open source connectors (ex. Sqoop) and utilities (ex. Httpfs/Curl on Linux) provided by database vendors and big data community to make it easy to exchange data, however in our experience engineering teams spend an inordinate amount of time writing code to simply shift data in and out of a big data system using these utilities.  Part of this is due to varying data structures in databases that need to be moved across making it essentially a bespoke development every time and part is due to integrating it with security mechanisms like Kerberos which are deployed in enterprise big data installations.  Typical data transfer coding involves handling various datatypes, accounting for volumes and variety of data to be transferred, writing test cases, creating workflow jobs for milestone / delta transfer and creating requisite Hive tables.  Testing all these steps also requires extensive engineering effort.
+We also evaluated the following tools available in the market or in the open source community none of which were able to meet the use cases we were trying to address:
+
+-	Gobblin (LinkedIn contributed Open Source tool) - more focused on management of data flow schedule rather than ingestion or extraction
+-	Apache Nifi (Open Source) - does not cover requisite end to end flow, integration with Kerberos
+-	ODI (covered under Oracle EWL) has limited big data integration capability
+
+In order to make it faster and easier to exchange data from/to a big data system, we propose Skool - Data Integration Tool.  This tool covers the following aspects:
+
+-	Seamless data transfer into a relational database (Oracle/Sql Server/MySql/Netezza or any JDBC compliant database)
+-	Seamless data transfer from a relational database into Hadoop (includes automated creation of Ozzie Workflows and Hive Tables)
+-	File transfer and Hive table creation for file based transfers into Hadoop
+-	Automatic generation and deployment of file creation scripts and jobs from Hadoop or Hive Tables
 
 #### Advantages of a  Skool:
 - Effort to write numerous lines of code for data integration would be replaced with a few clicks, thus saving valuable time.
@@ -33,9 +47,21 @@ Skool uses a number of open source projects to work properly:
 * [Pig] - high-level platform for creating MapReduce programs used with Hadoop
 * [Oozie] - Oozie is a workflow scheduler system to manage Apache Hadoop jobs.
 
-And of course Skool itself is open source with a [public repository][Skool]
- on GitHub
+And of course Skool itself is open source with a [public repository][Skool] on GitHub
  
+#### Scope
+A UI based open source tool which will ingest data automatically from following sources
+-	Any JDBC compliant database (Oracle/SqlServer/Netezza) → HDFS/Hive/Impala Metastore.
+-	HDFS/Hive/Impala Metastore → Any JDBC compliant database (Oracle/SqlServer/Netezza)
+-	Files (CSV, JSon, XML) → HDFS/Hive/Impala Metastore
+-	Hadoop → Hadoop transfer
+-	HDFS/Hive/Impala Metastore Files → File extract to downstream systems.
+
+#### Key Features
+-	Skool generates code which can be automatically executed (or scheduled) for delta and milestone replication with defined frequency of data refresh.
+-	Skool is configurable to select tables/columns/files which are to be transferred in our out of Hadoop.
+-	Inbuilt optimization of storage to deliver performant code – Skool takes into consideration table size, database partitions, file formats and compression.
+	
 ### Installation
  ```sh
  create a directory eg: mkdir skool_tool
@@ -59,12 +85,5 @@ cp Skool/di_tool_runnable/* configuration/
 mv configuration/run.sh .
 sh run.sh 
 ```
-#### License
-The MIT License (MIT)
-Copyright (c) 2016 BT Plc (www.btplc.com) Contact nitin.2.goyal@bt.com
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
