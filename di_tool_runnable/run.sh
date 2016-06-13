@@ -19,6 +19,14 @@ then
 		pwd_alias="hdi_$hostname"_"$source""_$db_schema.pswd"
 		pwd_dir="$jceks_id/$instance/$p_dir/$pwd_alias"
 		
+		if hadoop fs -ls /user/$instance/$p_dir
+		then
+		echo "HDI_PASSWORD_REPOSITORY exists."
+		else
+		hadoop fs -mkdir /user/$instance/$p_dir
+		hadoop fs -chmod 660 /user/$instance/$p_dir
+		fi
+		
 		pwd_date=`hadoop fs -ls /user/$instance/$p_dir/$pwd_alias | awk '{print $6}'`
 		read -s -p "Enter DB password for user $db_schema :" pwd
 		
