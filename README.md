@@ -76,13 +76,16 @@ A UI based open source tool which will ingest data automatically from following 
 **you need to get ojdbc6-11.2.0.3.jar and place in the <Skool/di_tool_runnable/> directory**
 
 cd ..
-mvn install
+mvn install -Dmaven.test.skip=true or mvn install 
 cp target/libs/* ../../libs
 cp target/dataintegration-0.0.1-SNAPSHOT.jar ../../
 cp configuration/configuration.properties ../../configuration/
 cd ../..
 cp Skool/di_tool_runnable/* configuration/
 mv configuration/run.sh .
+
+**incase you have skipped the test cases while building, edit the configuration/configuration.properties file according to your use case
+
 sh run.sh 
 ```
 
