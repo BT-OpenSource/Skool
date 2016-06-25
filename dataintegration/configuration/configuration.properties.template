@@ -72,10 +72,10 @@ export_dir=
 
 #In case export dir not given or left blank then user can provide below properties
 #database name where table is present.
-hive_database_name=HAASCT544_01
+hive_database_name=<hive database name>
 
 #Hive table name which you want to export! this is mandatory field in case export directory not given.
-export_hive_table=EMP_TEST
+export_hive_table=<hive table name>
 
 # Table partition column name with values! for eg part_year:2016,part_month:04
 table_part_name=
@@ -142,9 +142,14 @@ concurrency=1
 throttle=1
 timeout=0
 # frequency to be provided in minutes(1440 mins= 1 day)
+# Provide either frequency or cron frequency
 frequency=1440
-polling_frequency=10
+# Structure of Crontab parameters
+# Minute   Hour   Day of Month       Month          Day of Week    
+# (0-59)  (0-23)     (1-31)    (1-12 or Jan-Dec)  (0-6 or Sun-Sat)                
 cron_frequency=5 4 3 * *
+# Checks dataset availability in a specific directory (in minutes)
+polling_frequency=10
 # Coordinator SLA parameters
 sla_required=false
 sla_start_time=5
@@ -158,8 +163,8 @@ retention_period_raw_data=
 
 ########################################## LOGGING DETAILS ##########################################
 #Email address to which Oozie Success/Failure alerts will go to
-success_email_id=someone@bt.com
-failure_email_id=someone@bt.com
+success_email_id=someone@domain.com
+failure_email_id=someone@domain.com
 
 ##########################################COMPRESSION DETAILS###########################
 compression_required=true
