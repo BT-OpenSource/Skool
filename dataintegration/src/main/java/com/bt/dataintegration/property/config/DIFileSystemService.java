@@ -80,9 +80,9 @@ public class DIFileSystemService {
 			shellout = Utility.executeSSH(cmd);
 			if(shellout !=0){
 				logger.error("Error in sending file system validation jar to HDFS");
+				DirectoryHandler.cleanUpWorkspaceFile(servConf);	
 				throw new Error();
-			}	
-		
+			}		
 			
 			WorkflowXMLCodegen codegen = new WorkflowXMLCodegen();
 			codegen.generateXML(conf);

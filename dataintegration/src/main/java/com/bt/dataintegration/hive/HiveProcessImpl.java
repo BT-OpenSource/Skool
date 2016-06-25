@@ -10,16 +10,29 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import jline.internal.InputStreamReader;
 
-
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.log4j.Logger;
+
 import com.bt.dataintegration.constants.Constants;
+import com.bt.dataintegration.property.config.DIConfig;
 import com.bt.dataintegration.property.config.HadoopConfig;
 import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
+
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.Table;
 
 public class HiveProcessImpl implements IHiveProcess, Constants {
 	
@@ -383,7 +396,8 @@ public class HiveProcessImpl implements IHiveProcess, Constants {
 	
 	public String createAuditTableQueryBuilder() {
 		
-		String createAuitTableQuery ="create external table if not exists ${audit_table_name} (${hdi_tab_cols}) row format delimited fields terminated by ',' location '${location}'";
+		String createAuitTableQuery ="create external table if not exists ${audit_table_name} (${hdi_tab_cols}) partitioned by (table_name String) row format delimited fields terminated by ',' location '${location}';\n"+
+		"alter table ${audit_table_name} add if not exists partition (table_name = '${table_name}') location '${location}/${table_name}';";
 		
 		return createAuitTableQuery;
 	}
@@ -392,17 +406,18 @@ public class HiveProcessImpl implements IHiveProcess, Constants {
 		String createTableName="HDI_"+conf.getHiveTableName()+"_CREATE_TABLE.hql";
 		String addPartName="HDI_"+conf.getHiveTableName()+"_ADD_PARTITION.hql";
 		String auditTableFileName="HDI_CREATE_AUDIT_TABLE.hql";
-		DirectoryHandler.createNewFile(conf, createTableName, createTableFile());
-		DirectoryHandler.createNewFile(conf, addPartName, addPartFile());
 		DirectoryHandler.createNewFile(conf, auditTableFileName, createAuditTableQueryBuilder());
-		
-		DirectoryHandler.sendFileToHDFS(conf, createTableName);
-		DirectoryHandler.sendFileToHDFS(conf, addPartName);
 		DirectoryHandler.sendFileToHDFS(conf, auditTableFileName);
-		
-		DirectoryHandler.givePermissionToHDFSFile(conf, createTableName);
-		DirectoryHandler.givePermissionToHDFSFile(conf, addPartName);
 		DirectoryHandler.givePermissionToHDFSFile(conf, auditTableFileName);
+		
+		if(!SQOOP_EXPORT.equalsIgnoreCase(conf.getImport_export_flag())){
+			DirectoryHandler.createNewFile(conf, createTableName, createTableFile());
+			DirectoryHandler.createNewFile(conf, addPartName, addPartFile());
+			DirectoryHandler.sendFileToHDFS(conf, createTableName);
+			DirectoryHandler.sendFileToHDFS(conf, addPartName);
+			DirectoryHandler.givePermissionToHDFSFile(conf, createTableName);
+			DirectoryHandler.givePermissionToHDFSFile(conf, addPartName);
+	    }
 	}
 	
 	public String createTableFile(){
@@ -415,5 +430,179 @@ public class HiveProcessImpl implements IHiveProcess, Constants {
 		String cmd = "alter table ${hiveTableName} add if not exists partition (part_year='${dir_year}',part_month='${dir_month}',part_day='${dir_day}',part_hour='${dir_hour}',part_minute='${dir_minute}') location '${hiveAddPart}'";
 		
 		return cmd;
+	}
+	
+	public void validateAndcreateHiveQuery(DIConfig conf){
+		String query="";
+		LinkedList<String> li=new LinkedList<String>();
+		Map<String,String> hivepartition=new HashMap<String, String>();
+		LinkedHashMap<String,String> partitiondetails=new LinkedHashMap<String, String>();
+		
+		LinkedList<String> datetimestamp=new LinkedList<String>();
+		StringBuilder sb=new StringBuilder();
+		StringBuilder sb1=new StringBuilder();
+		String tempDir="'"+"${nameNode}/user/${queueName}/${HDI_SQOOL_TEMP_DIR}"+"'";
+		sb.append("INSERT OVERWRITE  DIRECTORY ").append(tempDir).append(" select ");
+		try {
+			String[]str =null;
+			if("".equalsIgnoreCase(conf.getDate_timestamp_column())){
+			}else{
+				str=conf.getDate_timestamp_column().split(",");
+				for(String colname:str){
+					datetimestamp.add(colname.toUpperCase());
+				}
+			}
+			
+			
+			HiveConf hconf = new HiveConf();
+			hconf.addResource(new FileInputStream(HIVE_SITE_XML));
+			//hconf.addResource("hive-site.xml");
+			HiveMetaStoreClient client = new HiveMetaStoreClient(hconf);
+			Table table = client.getTable(conf.getInstanceName(), conf.getExport_hive_table());
+			logger.info("Displaying database and table details..."+table.getDbName()+"     "+table.getTableName());
+			if(table.getPartitionKeys().size()>0){
+				logger.info("Displaying table partition details...");
+			for(FieldSchema fs:table.getPartitionKeys()){
+				logger.info(fs.getName());
+				hivepartition.put(fs.getName().toUpperCase(),fs.getType());
+			}
+			}else
+				logger.info("No partition key found in table!!! ");
+			//System.out.println("Displaying database and table details...");
+			//System.out.println(table.getDbName());
+			//System.out.println(table.getTableName());
+			List<FieldSchema> fields = client.getFields(conf.getInstanceName(), conf.getExport_hive_table());
+			ListIterator<FieldSchema> itr = fields.listIterator();
+			while(itr.hasNext()) {
+				//System.out.println(itr.next());
+				FieldSchema schema = itr.next();
+				
+				li.add(schema.getName().toUpperCase());
+				//System.out.println(schema.getName() + ":" + schema.getType());				
+			}
+			
+			if("".equalsIgnoreCase(conf.getTable_part_colname())&&hivepartition.size()>0 ){
+				String choice="y";
+				BufferedReader rdr = null;
+				try {
+					
+					rdr = new BufferedReader(new InputStreamReader(System.in));
+					logger.warn("The table has partition key but no partition key declared by you and in this case if you continue then full table will get exported !!\n To proceeds Please press 'A' to add partion key and value(eg part_year:2016,part_month:05)  'y' to continue  and 'n' to halt the execution");
+					//boolean status = rdr.ready();
+					//System.out.println(status);
+					choice = rdr.readLine();
+					while((("y".equalsIgnoreCase(choice)) || ("n".equalsIgnoreCase(choice))||("a".equalsIgnoreCase(choice))) == false){
+						choice = "";
+						logger.warn("Select an option \n A - To add partition \t y - Continue \t n - Hault Execution");
+						choice = rdr.readLine();
+					}
+					if("a".equalsIgnoreCase(choice)){
+						logger.info("Please provide partition key column and value (Comma separated values in case of multiple partition columns eg part_year:2016,part_month:04).Partition column should be from  "+hivepartition.toString());
+						//reader = new BufferedReader(new InputStreamReader(System.in));
+						String partitionColumn = "";
+						while((partitionColumn == null) || ("".equalsIgnoreCase(partitionColumn))){
+							partitionColumn = rdr.readLine();
+							if((partitionColumn == null) || ("".equalsIgnoreCase(partitionColumn))){
+								logger.warn("partition key column cannot be null. Please provide partition key with value  (Comma separated values in case of multiple columns).Partition column should be from  "+hivepartition.toString());;
+								partitionColumn = "";
+							}
+							else{
+								String[] partCols = partitionColumn.toUpperCase().split(",");
+								for(String part:partCols){
+									partitiondetails.put(part.split(":")[0].toUpperCase(), part.split(":")[1]);
+								}
+								
+								for (Map.Entry<String, String> partDetails : partitiondetails.entrySet()) {
+									if(!hivepartition.containsKey(partDetails.getKey())){
+										logger.info("Please provide partition key column and value (Comma separated values in case of multiple partition columns eg part_year:2016,part_month:04).Partition column should be from  "+hivepartition.toString());
+										partitionColumn = "";
+									}
+								}
+							}
+						}
+						//reader.close();
+						conf.setTable_part_colname(partitionColumn);
+						
+						
+					}
+					else if(choice.equalsIgnoreCase("n")) {
+						//reader.close();
+						DirectoryHandler.cleanUpWorkspaceExport(conf);					
+						throw new Error("Halting execution...");							
+					}else {
+						if(choice.equalsIgnoreCase("y")){
+						logger.info("Full table will get exported");	
+						}
+					}
+					
+				} catch (Exception e) {
+					logger.error("Error @validateAndcreateHiveQuery", e);
+				} finally {
+					if(rdr != null)
+						rdr.close();
+				}
+				
+			}
+			
+			if(!"".equalsIgnoreCase(conf.getTable_part_colname())){
+				partitiondetails.clear();
+				String[] partdetails=conf.getTable_part_colname().split(",");
+				//System.out.println(partdetails.length);
+				
+				for(String part:partdetails){
+					partitiondetails.put(part.split(":")[0].toUpperCase(), part.split(":")[1]);
+				}
+				}
+			
+			
+			if(str!=null){
+				for(String columnname:str){
+					if(!li.contains(columnname.toUpperCase())){
+						logger.error("column name is not matching with column name of hive table "+" "+"column of hive table are "+li.toString());
+						throw new Error("Mismatch between column name given by user and column name of hive table");
+					}
+				}
+			}
+			if(partitiondetails.size()!=0){
+				for(Entry<String, String> et:partitiondetails.entrySet()){
+					if(!hivepartition.containsKey(et.getKey())){
+					logger.error("partition name given is not matching with table parttion name or partition does not exist "+et.getKey());	
+					throw new Error("Partition key doesnot match! please check and try again ");
+					}
+				}
+			}
+			
+		for(String columnname:li){
+			if(datetimestamp.contains(columnname)){
+				sb.append("from_unixtime(unix_timestamp("+ columnname + ", 'yyyy-MM-dd HH:mm:ss')),");
+			}else
+				sb.append(columnname+",");
+			
+		}
+		
+		if("".equalsIgnoreCase(conf.getTable_part_colname())){
+			query=sb.toString().substring(0, sb.toString().lastIndexOf(","))+" from ${hive_database_name}.${export_hive_table};";	
+		}else	
+	     {
+			sb1.append(" where ");
+			for(Entry<String, String> et:partitiondetails.entrySet()){
+				
+				sb1.append(et.getKey()+"="+"'${"+et.getKey()+"}'"+" and ");	
+				
+					
+			}
+			query=sb.toString().substring(0, sb.toString().lastIndexOf(","))+" from ${hive_database_name}.${export_hive_table} "+sb1.toString().substring(0, sb1.lastIndexOf(" and ")) +";";	
+		}
+		//String query=sb.toString().substring(0, sb.toString().lastIndexOf(","))+" from "+conf.getHive_database_name()+"."+conf.getExport_hive_table()+""	
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		logger.info("Displaying hive export query "+query);
+		conf.setHive_export_query(query);
+		String Query="USE ${queueName};"+"\n" +"set mapred.job.queue.name=${queueName};"+"\n"+conf.getHive_export_query();
+		DirectoryHandler.createNewFile(conf,conf.getExport_hive_table()+".hql" ,Query);
+		DirectoryHandler.sendFileToHDFS(conf,conf.getExport_hive_table()+".hql");
+		DirectoryHandler.givePermissionToHDFSFile(conf,conf.getExport_hive_table()+".hql");
 	}
 }

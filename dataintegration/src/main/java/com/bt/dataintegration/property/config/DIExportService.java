@@ -19,14 +19,30 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.bt.dataintegration.database.DBConnectImpl;
+import com.bt.dataintegration.hive.HiveProcessImpl;
+import com.bt.dataintegration.oozie.coordinator.xmlcodegen.CoordinatorXMLCodegen;
+import com.bt.dataintegration.oozie.workflow.xmlcodegen.WorkflowXMLCodegen;
+import com.bt.dataintegration.shell.IShell;
+import com.bt.dataintegration.shell.ShellImpl;
 import com.bt.dataintegration.utilities.DirectoryHandler;
 import com.bt.dataintegration.utilities.Utility;
+
+import static com.bt.dataintegration.constants.Constants.*;
 
 public class DIExportService {
 
 	final static Logger logger = Logger.getLogger(DIExportService.class);
 	public static void main(String args[]){
 		String log4JPropertyFile = "log4j.properties";
+		String pwd = "";
+
+		try {
+			pwd = args[0];
+		} catch (NullPointerException e) {
+			logger.error("Please provide database password as argument");
+			logger.error(e);
+			throw new Error(e);
+		}
 		Properties p = new Properties();
 
 		try {
@@ -40,6 +56,7 @@ public class DIExportService {
 		DIConfig servConf = null;
 		DBConnectImpl oraImpl = new DBConnectImpl();
 		TableProperties tabProp = new TableProperties();
+		HiveProcessImpl hiveProp=new HiveProcessImpl();
 		LinkedHashMap<String, List<String>> oraTabMap = new LinkedHashMap<String, List<String>>();
 		Map<String, List<String>> tabPart = new HashMap<String, List<String>>();
 		Map<String, String> colCons = new HashMap<String, String>();
@@ -48,7 +65,7 @@ public class DIExportService {
 		try {
 			
 			servConf = new DIConfig().getDIConfigProperties();
-			
+			servConf.setSourcePassword(pwd);
 			String cmd1 = "mkdir "+servConf.getTableName();
 			Utility.executeSSH(cmd1);
 			
@@ -58,7 +75,9 @@ public class DIExportService {
 			boolean catCheck = oraImpl.validateCatalogPermission(con, servConf);
 				
 			valTabStats = oraImpl.validateTable(con,servConf);
+			if(servConf.isStagingRequired()){
 			valTabStats = oraImpl.validateStagingTable(con,servConf);
+			}
 			
 			oraTabMap = oraImpl.getColumnDetails(con,servConf);
 			
@@ -101,13 +120,13 @@ public class DIExportService {
 								}
 							}
 						}
-						reader.close();
+						//reader.close();
 						servConf.setUpdateDatabase(true);
 						servConf.setUpdateMode("updateonly");
 						servConf.setUpdateKeyColumn(updateColumn);
 					}
 					else if(choice.equalsIgnoreCase("n")) {
-						reader.close();
+						//reader.close();
 						DirectoryHandler.cleanUpWorkspaceExport(servConf);					
 						throw new Error("Halting execution...");							
 					}
@@ -131,31 +150,49 @@ public class DIExportService {
 			DirectoryHandler.createAuditLogPath(servConf);
 			DirectoryHandler.createPasswordDirectory(servConf);
 			
-			oraImpl.storePassword(servConf);
-		
+			//oraImpl.storePassword(servConf);
+			if("".equalsIgnoreCase(servConf.getExportDir())){
+			logger.info("Export Directory is blank ! Hence checking export hive database and table name");	
+			hiveProp.validateAndcreateHiveQuery(servConf);
+			}
 			oraImpl.storeTableMetadataForExport(servConf);
+			HadoopConfig conf=new HadoopConfig().getHadoopConfigProperties();
+			IShell shell = new ShellImpl();
+			shell.shellToHDFS(conf);
+			
+			HiveProcessImpl implHive = new HiveProcessImpl();
+			implHive.hiveScriptsFile(conf);
+			WorkflowXMLCodegen codegen = new WorkflowXMLCodegen();
+			////codegen.copyHivesiteXmlToHDFS(conf);					
+			codegen.generateXML(conf);
+			//DirectoryHandler.sendFileToHDFS(servConf,"workflow.xml");
+			
+			if (conf.isCoordinatorRequired()) {
+
+				CoordinatorXMLCodegen xmlCodegen = new CoordinatorXMLCodegen();
+				xmlCodegen.generateXML(conf);
+			}
 			
 			String cleanCmd = "mv job.properties "+servConf.getTableName()+"/job.properties";
 			Utility.executeSSH(cleanCmd);
 			
-			HadoopConfig conf = new HadoopConfig().getHadoopConfigProperties();
-			String cmd = "hadoop fs -put ojdbc6-11.2.0.3.jar " + conf.getWorkspacePath();
+			//HadoopConfig conf = new HadoopConfig().getHadoopConfigProperties();
+			String workspacePath=servConf.getAppNameNode()+"/user/"+servConf.getInstanceName()+"/workspace/HDI_"+servConf.getSourceName()+"_"+servConf.getTableOwner()+"_"+servConf.getTableName()+"_EXPORT/";
+			String cmd = "hadoop fs -put "+ OJDBC_JAR +" "+workspacePath;
 			int shellout = 1;
 			shellout = Utility.executeSSH(cmd);
 			if(shellout !=0){
 				throw new Error();
 			}
+			//String makeTempDir = "hadoop fs -mkdir /user/"+servConf.getInstanceName()+"/HDI_SQOOL_TEMP_DIR";
+			//shellout = Utility.executeSSH(makeTempDir);
 			
-			 
-			 cleanCmd = "cp configuration.properties "+servConf.getTableName()+"/configuration.properties";
-			 Utility.executeSSH(cleanCmd);
 		} catch (Exception e) {
-
-			System.out.println("Error ar DIConfigService.main()");
-			logger.error("Error ar DIConfigService.main()");
+            
+			System.out.println("Error ar DIExportService.main()");
+			logger.error("Error ar DIExportService.main()");
 			DirectoryHandler.cleanUpWorkspaceExport(servConf);	
 			throw new Error(e);
-		}
-		
+		} 
 	}
 }

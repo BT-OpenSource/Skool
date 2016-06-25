@@ -720,7 +720,7 @@ public class DBConnectImpl implements IDBConnect {
 			
 			prop.setProperty("sqoopColumns",query[1]);
 			prop.setProperty("sqoopTableName", conf.getTableOwner()+"."+conf.getTableName());
-			prop.setProperty("hiveTableName", conf.getTableName());
+			prop.setProperty("hiveTableName", conf.getHiveTable());
 			prop.setProperty("source_name", conf.getSourceName());
 			prop.setProperty("schema_name", conf.getTableOwner());
 			prop.setProperty("mapColumnJava",query[2]);
@@ -738,11 +738,11 @@ public class DBConnectImpl implements IDBConnect {
 			String pwdProviderPath = JCEKS + "/" + conf.getInstanceName() + "/HDI_Password_Repository/${password_alias}";
 			prop.setProperty("pwd_provider_path", pwdProviderPath);
 			
-			prop.setProperty("targetDirYear", DirectoryHandler.targetDirYear);
+			/*prop.setProperty("targetDirYear", DirectoryHandler.targetDirYear);
 			prop.setProperty("targetDirMonth", DirectoryHandler.targetDirMonth);
 			prop.setProperty("targetDirDate", DirectoryHandler.targetDirDate);
 			prop.setProperty("targetDirHour", DirectoryHandler.targetDirHour);
-			prop.setProperty("targetDirMinute", DirectoryHandler.targetDirMinute);
+			prop.setProperty("targetDirMinute", DirectoryHandler.targetDirMinute);*/
 			
 			prop.setProperty("targetDirectory", landingDir);
 			
@@ -804,7 +804,7 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("oozie_launcher_action_main_class", "org.apache.oozie.action.hadoop.Hive2Main");
 			prop.setProperty("sqoopFileFormat", "--as-"+conf.getSqoopFileFormat());
 			prop.setProperty("shell_file_init", "refresh_last_col_value.sh");
-			prop.setProperty("audit_log_file_path","${nameNode}/user/${queueName}/HDI_AUDIT/audit_logs.txt");
+			prop.setProperty("audit_log_file_path","${nameNode}/user/${queueName}/HDI_AUDIT/${tableName}/audit_logs.txt");//added partition for table in audit
 			prop.setProperty("audit_log_path","${nameNode}/user/${queueName}/HDI_AUDIT");
 			prop.setProperty("audit_shell_file",AUDIT_LOG_SCRIPT);
 			prop.setProperty("error_shell_file",ERROR_LOG_SCRIPT);
@@ -816,6 +816,15 @@ public class DBConnectImpl implements IDBConnect {
 
 			prop.setProperty("hdi_audit_table_cols",auditTableCols);
 			
+			//compression related changes
+			if(conf.isCompressionRequired() == true){
+				prop.setProperty("compression_required", "true");
+				prop.setProperty("compression_codec", conf.getComressionCodec());
+			}
+			else
+				prop.setProperty("compression_required", "false");
+			
+			
 			
 			if(conf.getRetentionRawData() == -1)
 				prop.setProperty("retention_period_raw_data", "");
@@ -825,6 +834,17 @@ public class DBConnectImpl implements IDBConnect {
 				prop.setProperty("retention_period_processed_data", "");
 			else
 				prop.setProperty("retention_period_processed_data", String.valueOf(conf.getRetentionProcessedData()));*/
+			
+			String slaFlag = "";
+			if(conf.isSlaRequired()) {				
+				slaFlag = "true";
+				prop.setProperty("sla_contact", conf.getSlaContact());
+				prop.setProperty("sla_start", conf.getSlaStart());
+				prop.setProperty("sla_end", conf.getSlaEnd());
+			} else {
+				slaFlag = "false";
+			}
+			prop.setProperty("sla_required", slaFlag);
 			
 			prop.store(fout, null);
 			
@@ -863,7 +883,7 @@ public class DBConnectImpl implements IDBConnect {
 	
 	public void storeTableMetadataForExport(DIConfig conf){
 
-		logger.info("Storing Table metadata in job.properties");
+		logger.info("Storing Table metadata in"+JOB_PROP_FILE);
 		Properties prop = new Properties();
 		OutputStream fout = null;
 		//String fileName = conf.getTableName()+"/job.properties";
@@ -873,31 +893,38 @@ public class DBConnectImpl implements IDBConnect {
 		try {
 
 			fout = new FileOutputStream(JOB_PROP_FILE);
+			
 			prop.setProperty("import_export_flag", conf.getImport_export_flag());
 			prop.setProperty("nameNode",conf.getWorkflowNameNode());
 			prop.setProperty("jobTracker",conf.getJobTracker());
 			prop.setProperty("queueName",conf.getInstanceName());
 			prop.setProperty("oozie.use.system.libpath","TRUE");
+			prop.setProperty("shell_file_init", CAPTURE_START_DATE_TIME_SCRIPT);
 			//prop.setProperty("wf_application_path","${nameNode}/user/${queueName}/workspace");
 			prop.setProperty("wf_application_path",workspacePath);
 			if(conf.isCoordinatorFlag()){
 				prop.setProperty("oozie.coord.application.path",workspacePath);
 				prop.setProperty("coordinator_required", "true");
+				prop.setProperty("start",conf.getWfStartTime());
+				prop.setProperty("end",conf.getWfEndTime());
+				prop.setProperty("timezone",conf.getTimeZone());
+				prop.setProperty("concurrency",conf.getConcurrency());
+				prop.setProperty("throttle",conf.getThrottle());
+				prop.setProperty("timeout",conf.getTimeout());
+				prop.setProperty("frequency",conf.getFrequency());
+				
+				System.out.println(conf.getFrequency());
+				prop.setProperty("frequency",conf.getFrequency());							
 			}
 			else{
 				prop.setProperty("oozie.wf.application.path",workspacePath);
 				prop.setProperty("coordinator_required", "false");
 			}
-			prop.setProperty("start",conf.getWfStartTime());
-			prop.setProperty("end",conf.getWfEndTime());
-			prop.setProperty("timezone",conf.getTimeZone());
+			
 			prop.setProperty("success_emails",conf.getSuccessEmailId());
 			prop.setProperty("failure_emails",conf.getFailureEmailId());
 			//prop.setProperty("tableSize",tabProp.getTableSize().toString());
-			prop.setProperty("concurrency",conf.getConcurrency());
-			prop.setProperty("throttle",conf.getThrottle());
-			prop.setProperty("timeout",conf.getTimeout());
-			prop.setProperty("frequency",conf.getFrequency());
+			
 			
 			logger.info("Setting properties for job.properties...");
 			
@@ -905,17 +932,18 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("tableName", conf.getTableName());
 			prop.setProperty("source_name", conf.getSourceName());
 			prop.setProperty("schema_name", conf.getTableOwner());
+			s.append(ORACLE_DRIVER_TYPE).append(":@").append(conf.getSourceHostName()).append(":").append(conf.getSourcePort()).append("/").append(conf.getSourceSid());
 			prop.setProperty("DBConnectString", s.toString());
+			
 			
 			prop.setProperty("userName", conf.getSourceUsername());
 			
-			prop.setProperty("password", "${nameNode}/user/${queueName}/HDI_Password_Repository/${source_name}_${schema_name}_pfile.txt");
-
-			prop.setProperty("targetDirYear", DirectoryHandler.targetDirYear);
-			prop.setProperty("targetDirMonth", DirectoryHandler.targetDirMonth);
-			prop.setProperty("targetDirDate", DirectoryHandler.targetDirDate);
-			prop.setProperty("targetDirHour", DirectoryHandler.targetDirHour);
-			prop.setProperty("targetDirMinute", DirectoryHandler.targetDirMinute);
+			//prop.setProperty("password", "${nameNode}/user/${queueName}/HDI_Password_Repository/${source_name}_${schema_name}_pfile.txt");
+			String alias = "hdi_" +conf.getSourceHostName()+"_"+conf.getSourceName() + "_" + conf.getTableOwner() + ".pswd"; 
+			prop.setProperty("password_alias", alias);
+			
+			String pwdProviderPath = JCEKS + "/" + conf.getInstanceName() + "/HDI_Password_Repository/${password_alias}";
+			prop.setProperty("pwd_provider_path", pwdProviderPath);
 			
 			prop.setProperty("numOfMappers", String.valueOf(conf.getNumOfMapper()));
 			
@@ -927,23 +955,42 @@ public class DBConnectImpl implements IDBConnect {
 			prop.setProperty("application_nameNode", conf.getAppNameNode());
 			prop.setProperty("oozie_action_sharelib_for_hive", "hive2");
 			prop.setProperty("oozie_launcher_action_main_class", "org.apache.oozie.action.hadoop.Hive2Main");
-			prop.setProperty("sqoopFileFormat", "--as-"+conf.getSqoopFileFormat());
-			prop.setProperty("audit_log_file_path","${nameNode}/user/${queueName}/HDI_AUDIT/audit_logs.txt");
+			//prop.setProperty("sqoopFileFormat", "--as-"+conf.getSqoopFileFormat());
+			prop.setProperty("audit_log_file_path","${nameNode}/user/${queueName}/HDI_AUDIT/${tableName}/audit_logs.txt");
 			prop.setProperty("audit_log_path","${nameNode}/user/${queueName}/HDI_AUDIT");
 			prop.setProperty("audit_shell_file","audit_logs.sh");
 			prop.setProperty("error_shell_file","error_logs.sh");
 			prop.setProperty("audit_table_name","HDI_AUDIT");
 			prop.setProperty("hive_create_audit_table","HDI_CREATE_AUDIT_TABLE.hql");
-			String auditTableCols = "WORKFLOW_ID STRING,WORKFLOW_NAME STRING,RUN_NO STRING,JOB_START_TIME STRING,JOB_END_TIME STRING,ORACLE_TABLE_NAME STRING,SQOOP_IE_FLAG STRING,HADOOP_RAW_DATA_DIR STRING,RECORD_COUNT STRING,JOB_STATUS STRING,ERROR_MESSAGE STRING,ERROR_CODE STRING";
-
-			prop.setProperty("hdi_audit_table_cols",auditTableCols);
+			//String auditTableCols = "WORKFLOW_ID STRING,WORKFLOW_NAME STRING,RUN_NO STRING,JOB_START_TIME STRING,JOB_END_TIME STRING,ORACLE_TABLE_NAME STRING,SQOOP_IE_FLAG STRING,HADOOP_RAW_DATA_DIR STRING,RECORD_COUNT STRING,JOB_STATUS STRING,ERROR_MESSAGE STRING,ERROR_CODE STRING";
+			String auditTableCols = HDI_AUDIT_COLS;
 			
-			prop.setProperty("exportDirectory",conf.getExportDir());
+			prop.setProperty("hdi_audit_table_cols",auditTableCols);
+			if("".equalsIgnoreCase(conf.getExportDir())){
+			prop.setProperty("hive_database_name",conf.getHive_database_name());	
+			prop.setProperty("export_hive_table",conf.getExport_hive_table());
+			prop.setProperty("partition_cols_details",conf.getTable_part_colname());
+			//prop.setProperty("hive_export_query",conf.getHive_export_query());
+			prop.setProperty("hive_export_script_name",conf.getExport_hive_table()+".hql");
+			prop.setProperty("export_hive_dir","${nameNode}/user/${queueName}/HDI_SQOOL_TEMP_DIR");
+			conf.setFieldSeparator("\\001");
+			}
+			prop.setProperty("export_user_dir",conf.getExportDir());
+			if(!"".equalsIgnoreCase(conf.getTable_part_colname())&& ("".equalsIgnoreCase(conf.getExportDir()))){
+				String[]partDetails=conf.getTable_part_colname().split(",");
+				for(String partition:partDetails){
+				 prop.setProperty(partition.split(":")[0].toUpperCase(),partition.split(":")[1]);	
+				}
+				
+			}
+			if(null!=conf.getUpdateKeyColumn()){
 			prop.setProperty("update_key_column",conf.getUpdateKeyColumn());
-			prop.setProperty("update_mode", conf.getUpdateMode());
-			prop.setProperty("staging_table",conf.getStagingTable());
-			if(conf.isStagingRequired())
+			prop.setProperty("update_mode", conf.getUpdateMode().toLowerCase());
+			}
+			if(conf.isStagingRequired()){
 				prop.setProperty("staging_required","true");
+			    prop.setProperty("staging_table",conf.getStagingTable());
+			  }
 			else
 				prop.setProperty("staging_required","false");
 			if(conf.isUpdateDatabase())
@@ -951,8 +998,28 @@ public class DBConnectImpl implements IDBConnect {
 			else
 				prop.setProperty("update_database_required","false");
 			
+
 			prop.setProperty("fieldSeparator",conf.getFieldSeparator());
 			prop.setProperty("lineSeparator",conf.getLineSeparator());
+			prop.setProperty("input_null_string",conf.getInput_null_string());
+			prop.setProperty("input_null_non_string_column",conf.getInput_null_non_string());
+			
+			String slaFlag = "";
+			if(conf.isSlaRequired()) {				
+				slaFlag = "true";
+				prop.setProperty("sla_contact", conf.getSlaContact());
+				prop.setProperty("sla_start", conf.getSlaStart());
+				prop.setProperty("sla_end", conf.getSlaEnd());
+			} else {
+				slaFlag = "false";
+			}
+			prop.setProperty("sla_required", slaFlag);
+			
+			if("".equalsIgnoreCase(conf.getExportDir())) {
+				prop.setProperty("hive_table_export_dir", conf.getExport_hive_table());
+			} else {
+				prop.setProperty("hive_table_export_dir", conf.getExportDir());
+			}
 			
 			prop.store(fout, null);
 			

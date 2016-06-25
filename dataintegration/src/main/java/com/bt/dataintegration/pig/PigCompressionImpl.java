@@ -27,9 +27,11 @@ public class PigCompressionImpl implements IPigCompression{
 		else if(conf.getSqoopFileFormat().contains("text")){
 			fileFormat = "PigStorage('\\u0001')";
 		}
-		String pigCmd = "set mapred.child.java.opts "+MAPRED_CHILD_JAVA_OPTS+"; \nset output.compression.enabled true; \nset output.compression.codec "+OUTPUT_COMPRESSION_CODEC+"; \n"
-				+ "raw_equipment = load '" + conf.getTargetDirectory()+"' USING "+fileFormat+";\n"
-				+"store raw_equipment into '"+conf.getLandingDirectory()+"/temp' USING "+fileFormat+"; \n";
+		String pigCmd = "set mapred.child.java.opts "+MAPRED_CHILD_JAVA_OPTS+"; \n"+
+						"set mapred.output.compress true; \n"+
+						"set mapred.output.compression.codec "+conf.getCompressionCodec()+"; \n"+
+						"raw_equipment = load '" + conf.getTargetDirectory()+"' USING "+fileFormat+";\n"+
+						"store raw_equipment into '"+conf.getLandingDirectory()+"/temp' USING "+fileFormat+"; \n";
 		
 		logger.debug("pig command to compress data ---" +pigCmd);
 		
@@ -43,7 +45,7 @@ public class PigCompressionImpl implements IPigCompression{
 			throw new Error();
 		}
 
-  		pigCmd = "set mapred.child.java.opts "+MAPRED_CHILD_JAVA_OPTS+"; \nset output.compression.enabled true; \nset output.compression.codec "+OUTPUT_COMPRESSION_CODEC+"; \n"
+  		pigCmd = "set mapred.child.java.opts "+MAPRED_CHILD_JAVA_OPTS+"; \nset mapred.output.compress true; \nset mapred.output.compression.codec "+conf.getCompressionCodec()+"; \n"
 				+ "raw_equipment = load '${targetDirectory}/${year}/${month}/${date}/${hour}/${minute}' USING "+fileFormat+";\n"
 				+"store raw_equipment into '${targetDirectory}/temp' USING "+fileFormat+"; \n";
   		
@@ -149,8 +151,8 @@ public class PigCompressionImpl implements IPigCompression{
 						"Store val into '${valid_final_dir}' using PigStorage('\\u0001');\n"+
 						"STORE inval INTO '${rejected_dir}' USING PigStorage('\\u0001');\n";*/
 		String pigCmd = "set mapred.child.java.opts -Xmx4096m;\n"+
-				"set output.compression.enabled true;\n"+
-				"set output.compression.codec org.apache.hadoop.io.compress.SnappyCodec;\n"+
+				"set mapred.output.compress true;\n"+
+				"set mapred.output.compression.codec "+conf.getCompressionCodec()+";\n"+
 				"register ${jar_file};\n"+
 				"raw = load '${temp_dir}' USING com.bt.dataintegration.fileValidations.Pig_Load('${pig_cols}','${input_date_format}','"+Utility.delimiter+"','${fileTrailerKeyword}','${fileHeaderKeyword}');\n"+
 				"valid_data = filter raw by $0 == '0';\n"+

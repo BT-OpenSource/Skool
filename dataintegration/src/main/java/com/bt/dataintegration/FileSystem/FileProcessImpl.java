@@ -235,7 +235,7 @@ public class FileProcessImpl implements IFileProcess {
 					"org.apache.oozie.action.hadoop.Hive2Main");
 			prop.setProperty("shell_file_init",CAPTURE_CREATED_DATE_SCRIPT);
 			prop.setProperty("audit_log_file_path",
-					"${nameNode}/user/${queueName}/HDI_AUDIT/"+AUDIT_FILE);
+					"${nameNode}/user/${queueName}/HDI_AUDIT/${hiveTableName}/"+AUDIT_FILE);//added partition for table in audit
 			prop.setProperty("audit_log_path",
 					"${nameNode}/user/${queueName}/HDI_AUDIT");
 			prop.setProperty("audit_shell_file", AUDIT_LOG_SCRIPT);
@@ -265,6 +265,33 @@ public class FileProcessImpl implements IFileProcess {
 			prop.setProperty("fileHeaderKeyword", conf.getFileHeaderKeyword());
 			prop.setProperty("lineNumberData",
 					String.valueOf(conf.getLineNumberData()));
+			String pollFreq = conf.getPollingFrequency();
+			
+			if(! "".equalsIgnoreCase(pollFreq)) {
+				prop.setProperty("polling_frequency", pollFreq);
+			}
+			
+			//Setting SLA properties
+			String slaFlag = "";
+			if(conf.isSlaRequired()) {				
+				slaFlag = "true";
+				prop.setProperty("sla_contact", conf.getSlaContact());
+				prop.setProperty("sla_start", conf.getSlaStart());
+				prop.setProperty("sla_end", conf.getSlaEnd());
+			} else {
+				slaFlag = "false";
+			}
+			prop.setProperty("sla_required", slaFlag);
+			
+			
+			//compression related changes
+			if(conf.isCompressionRequired() == true){
+				prop.setProperty("compression_required", "true");
+				prop.setProperty("compression_codec", conf.getComressionCodec());
+			}
+			else
+				prop.setProperty("compression_required", "false");
+			
 			prop.store(fout, null);
 
 		} catch (IOException e) {

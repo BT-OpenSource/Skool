@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * @author 609349708 (Abhinav Meghmala)
  */
-@XmlType(propOrder = { "global", "hiveCreds", "st", "fsc","shellInit", "javaFSValidate",
-		"sqImport", "pigCompress", "shellRefresh", "hs2", "hs2AddPart", "auditTable", 
-		"createAuditTable", "housekeeping", "shellErr", "success", "failure", "kt", "et" })
+@XmlType(propOrder = { "global", "hiveCreds", "st", "shellInit", "javaFSValidate",
+		"sqTag", "pigCompress", "shellRefresh", "hs2", "hs2AddPart", "auditTable", 
+		"createAuditTable", "housekeeping", "shellErr", "fsc", "success", "failure", "kt", "et" })
 @XmlRootElement(name = "workflow-app")
 public class Workflow {
 
@@ -22,9 +22,9 @@ public class Workflow {
 	private Global global;
 	private Credentials hiveCreds;
 	// private List<Object> actions = new LinkedList<Object>();
-	private ActionSqoopImport sqImport;
+	private ActionSqoopTag sqTag;
 	private StartTo st;
-	private ActionFSCreate fsc;
+	private ActionFS fsc;
 	private ActionHive2 hs2;
 	private ActionEmailNotification success;
 	private ActionEmailNotification failure;
@@ -76,13 +76,13 @@ public class Workflow {
 		this.hiveCreds = hiveCreds;
 	}
 
-	public ActionSqoopImport getSqImport() {
-		return sqImport;
+	public ActionSqoopTag getSqTag() {
+		return sqTag;
 	}
 
 	@XmlElement(name = "action")
-	public void setSqImport(ActionSqoopImport sqImport) {
-		this.sqImport = sqImport;
+	public void setSqTag(ActionSqoopTag sqTag) {
+		this.sqTag = sqTag;
 	}
 
 	public StartTo getSt() {
@@ -94,12 +94,12 @@ public class Workflow {
 		this.st = st;
 	}
 
-	public ActionFSCreate getFsc() {
+	public ActionFS getFsc() {
 		return fsc;
 	}
 
 	@XmlElement(name = "action")
-	public void setFsc(ActionFSCreate fsc) {
+	public void setFsc(ActionFS fsc) {
 		this.fsc = fsc;
 	}
 
@@ -228,5 +228,6 @@ public class Workflow {
 	public void setShellErr(ActionShell shellErr) {
 		this.shellErr = shellErr;
 	}
+	
 	
 }

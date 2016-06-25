@@ -103,29 +103,36 @@ public static void createPasswordDirectory(DIConfig conf){
 
 public static void createAuditLogPath(DIConfig conf){
 	logger.info("Creating/Checking Audit log path");
-	String cmd = "hadoop fs -ls "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT";
+	String auditLogPath = "";
+	if(conf.getImport_export_flag().equals(SQOOP_IMPORT) || conf.getImport_export_flag().equals(SQOOP_EXPORT)){
+		auditLogPath = conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+conf.getTableName();
+	}
+	else if(conf.getImport_export_flag().equals(FILE_IMPORT)){
+		auditLogPath = conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+conf.getHiveTable();
+	}
+	String cmd = "hadoop fs -ls "+auditLogPath;
 	int shellout = 1;
 	shellout = Utility.executeSSH(cmd);
 	if(shellout == 0){
-		cmd = "hadoop fs -ls "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
+		cmd = "hadoop fs -ls "+auditLogPath+"/"+AUDIT_FILE;
 		shellout = Utility.executeSSH(cmd);
 		if(shellout != 0){
-			cmd = "hadoop fs -touchz "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
+			cmd = "hadoop fs -touchz "+auditLogPath+"/"+AUDIT_FILE;
 			shellout = Utility.executeSSH(cmd);
-			cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
+			cmd = "hadoop fs -chmod 660 "+auditLogPath+"/"+AUDIT_FILE;
 			shellout = Utility.executeSSH(cmd);
 		}
 		else{
-			cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
+			cmd = "hadoop fs -chmod 660 "+auditLogPath+"/"+AUDIT_FILE;
 			shellout = Utility.executeSSH(cmd);
 		}
 	}
 	else{
-		cmd = "hadoop fs -mkdir -p "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT";
+		cmd = "hadoop fs -mkdir -p "+auditLogPath;
 		shellout = Utility.executeSSH(cmd);
-		cmd = "hadoop fs -touchz "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
+		cmd = "hadoop fs -touchz "+auditLogPath+"/"+AUDIT_FILE;
 		shellout = Utility.executeSSH(cmd);
-		cmd = "hadoop fs -chmod 660 "+conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/HDI_AUDIT/"+AUDIT_FILE;
+		cmd = "hadoop fs -chmod 660 "+auditLogPath+"/"+AUDIT_FILE;
 		shellout = Utility.executeSSH(cmd);
 	}
 }
@@ -184,7 +191,9 @@ public static void sendFileToHDFS(Object obj,String fileName){
 			}
 			else{
 				cleanUpWorkspace((DIConfig)obj);
-				cleanUpLanding((DIConfig)obj);
+				if(!((DIConfig) obj).getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT)){
+					cleanUpLanding((DIConfig)obj);
+				}
 			}
 		}
 		else if(obj instanceof HadoopConfig){
@@ -193,7 +202,9 @@ public static void sendFileToHDFS(Object obj,String fileName){
 			}
 			else{
 				cleanUpWorkspace((HadoopConfig)obj);
-				cleanUpLanding((HadoopConfig)obj);
+				if(!((HadoopConfig) obj).getImport_export_flag().equalsIgnoreCase(SQOOP_EXPORT)){
+					cleanUpLanding((HadoopConfig)obj);
+				}
 			}
 		}
 		throw new Error();
@@ -320,14 +331,24 @@ public static void cleanUpWorkspace(Object obj){
 	logger.info("Cleaning up the workspace directory structure");
 	if(obj instanceof DIConfig){
 		DIConfig conf = (DIConfig)obj;
-		workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
+		if(SQOOP_EXPORT.equalsIgnoreCase(conf.getImport_export_flag())){
+			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT";	
+		}else
+		{
+			workspacePath=conf.getAppNameNode()+"/user/"+conf.getInstanceName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();	
+		}
 		landingDir=conf.getLandingDirectory();
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;
 	}
 	else if(obj instanceof HadoopConfig){
 		HadoopConfig conf = (HadoopConfig)obj;
-		workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();
+		if(SQOOP_EXPORT.equalsIgnoreCase(conf.getImport_export_flag())){
+			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName()+"_EXPORT";	
+		}else
+		{
+			workspacePath=conf.getAppNameNode()+"/user/"+conf.getQueueName()+"/workspace/HDI_"+conf.getSourceName()+"_"+conf.getTableOwner()+"_"+conf.getTableName();	
+		}
 		landingDir=conf.getLandingDirectory();
 		passFileName = conf.getTableName()+"/"+conf.getSourceName()+"_"+conf.getTableOwner()+"_pfile.txt";
 		jobPropName = conf.getTableName()+"/"+JOB_PROP_FILE;

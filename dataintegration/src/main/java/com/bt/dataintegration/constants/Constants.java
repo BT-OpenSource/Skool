@@ -46,7 +46,10 @@ public interface Constants {
                 public static final String AVRO_SCHEMA_URL = "avro.schema.url";
                 public static final String SERDE_FORMAT = "org.apache.hadoop.hive.serde2.avro.AvroSerDe";
                 public static final String MAPRED_CHILD_JAVA_OPTS = "-Xmx4096m";
-                public static final String OUTPUT_COMPRESSION_CODEC = "org.apache.hadoop.io.compress.SnappyCodec";
+                //public static final String OUTPUT_COMPRESSION_CODEC = "org.apache.hadoop.io.compress.SnappyCodec";
+                public static final String SNAPPY_COMPRESSION_CODEC = "org.apache.hadoop.io.compress.SnappyCodec";
+                public static final String BZIP2_COMPRESSION_CODEC = "org.apache.hadoop.io.compress.BZip2Codec";
+                public static final String GZIP_COMPRESSION_CODEC = "org.apache.hadoop.io.compress.GzipCodec";
                 // Oozie workflow XML constants
                 public static final String GCP_QUEUENAME = "mapred.job.queue.name";
                 public static final String HS2_CP_URI = "hive2.jdbc.url";
@@ -68,7 +71,7 @@ public interface Constants {
                 public static final String SHELL_XMLNS = "uri:oozie:shell-action:0.1";
                 public static final String HIVE_CREDENTIALS = "hive_credentials";
                 public static final String HIVE_CREDENTIALS_TYPE = "hive2";
-                public static final String HDI_AUDIT_COLS = "WORKFLOW_ID STRING,WORKFLOW_NAME STRING,RUN_NO STRING,JOB_START_TIME STRING,JOB_END_TIME STRING,ORACLE_TABLE_NAME STRING,SQOOP_IE_FLAG STRING,HADOOP_RAW_DATA_DIR STRING,RECORD_COUNT STRING,JOB_STATUS STRING,ERROR_CODE STRING,ERROR_MESSAGE STRING,FILE_SOURCE_DIRECTORY STRING,MILESTONE_INCREMENTAL STRING";
+                public static final String HDI_AUDIT_COLS = "WORKFLOW_ID STRING,WORKFLOW_NAME STRING,RUN_NO STRING,JOB_START_TIME STRING,JOB_END_TIME STRING,IMPORT_EXPORT_FLAG STRING,HADOOP_RAW_DATA_DIR STRING,RECORD_COUNT STRING,JOB_STATUS STRING,MILESTONE_INCREMENTAL STRING,FILE_SOURCE_DIRECTORY STRING,ERROR_MESSAGE STRING,ERROR_CODE STRING";
                 public static final String HDI_FILE_VALIDATE_JAR = "file-validations-v1.jar";
                 public static final String SQOOP_CREDS_PARAM = "hadoop.security.credential.provider.path";
                 // public static final String JAVA_MAIN_CLASS =
@@ -98,6 +101,7 @@ public interface Constants {
                 public static final String AUDIT_LOG_SCRIPT = "audit_logs.sh";
                 public static final String HOUSE_KEEPING_SCRIPT = "housekeep.sh";
                 public static final String ERROR_LOG_SCRIPT = "error_logs.sh";
+                public static final String CAPTURE_START_DATE_TIME_SCRIPT="capture_start_time.sh";
                 public static final String CAPTURE_CREATED_DATE_SCRIPT = "capture_date_createdir.sh";
                 public static final String OJDBC_JAR = "configuration/ojdbc6-11.2.0.3.jar";
                 public static final String FILE_VALIDATIONS_JAR = "configuration/file-validations-v1.jar";
@@ -117,10 +121,21 @@ public interface Constants {
                 public static final String ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE = "REFRESH_LAST_MODIFIED_DATE_VALUE";
                 public static final String ACTION_PIG_COMPRESS = "PIG_COMPRESS_DATA";
                 public static final String ACTION_CAPTURE_DATE_AND_CREATEDIR = "CAPTURE_DATE_AND_CREATEDIR";
+                public static final String ACTION_SQOOP_EXPORT_TO_RDBMS_TABLE="SQOOP_EXPORT_TO_RDBMS_TABLE";
+                public static final String ACTION_HIVE_EXTRACT_DATA="HIVE_EXTRACT_DATA";
+                public static final String ACTION_EXPORT_SHELL_STARTTO = "CAPTURE_WORKFLOW_START_TIME";  
+                public static final String ACTION_FS_DELETE = "DELETE_TEMP_DIRECTORY";
                 
                 public static final int SHELL_SUCCESS = 0;
                 public static final int SHELL_FAILURE = 1;
 				public static final String PIG_RECORD_VALIDATOR_SCRIPT="pig_record_validator.pig";
 	            public static final String COORDINATOR_XML_FILE="coordinator.xml";
-
+	            public static final String WORKFLOW_XML_FILE="workflow.xml";
+	            public static final String HIVE_SITE_XML="configuration/hive-site.xml";
+	            public static final String TEMP_FS = "${nameNode}/user/${queueName}/${wf:id()}";
+	            
+	            //Oozie SLA constants
+	            public static final String SLA_NOMINAL_TIME = "${coord:nominalTime()}";
+	            public static final String SLA_MESSAGE = "SLA breached !!";
+	            
 }

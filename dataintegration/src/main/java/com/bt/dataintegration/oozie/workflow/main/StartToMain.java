@@ -12,12 +12,20 @@ public class StartToMain {
 	private StartTo sto = new StartTo();
 	
 	public StartTo setStartTo(HadoopConfig hconf) {
-		
-		if(SQOOP_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())) {
+		String ieFlag=hconf.getImport_export_flag();
+		if(SQOOP_IMPORT.equalsIgnoreCase(ieFlag)) {
 			sto.setStartTo(ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE);
 		}
-		if(FILE_IMPORT.equalsIgnoreCase(hconf.getImport_export_flag())){
+		if(FILE_IMPORT.equalsIgnoreCase(ieFlag)){
 			sto.setStartTo(ACTION_CAPTURE_DATE_AND_CREATEDIR);
+		}
+		if(SQOOP_EXPORT.equalsIgnoreCase(ieFlag)) {
+			/*if("".equalsIgnoreCase(hconf.getExport_user_dir())) {
+				sto.setStartTo(ACTION_HIVE_EXTRACT_DATA);
+			} else {
+				sto.setStartTo(ACTION_SQOOP_EXPORT_TO_RDBMS_TABLE);
+			}*/
+			sto.setStartTo(ACTION_EXPORT_SHELL_STARTTO);
 		}
 		
 		return sto;

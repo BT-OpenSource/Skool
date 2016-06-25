@@ -100,7 +100,8 @@ public class DIConfigService {
 
 			DirectoryHandler.createWorkflowPath(servConf);
 			DirectoryHandler.createAuditLogPath(servConf);
-
+			DirectoryHandler.createPasswordDirectory(servConf);
+			
 			// Password will be taken form the user and will be stored in
 			// encrypted fashion in HDFS
 			// DirectoryHandler.createPasswordDirectory(servConf);
@@ -111,11 +112,12 @@ public class DIConfigService {
 			HadoopConfig conf = new HadoopConfig().getHadoopConfigProperties();
 			implsqoop.sqoopImport(conf);
 			
-			if (!(conf.getSqoopFileFormat().contains("parquet"))) {
-				PigCompressionImpl pig = new PigCompressionImpl();
-				pig.compressData(conf);
+			if(conf.isCompressionRequired() == true){
+				if (!(conf.getSqoopFileFormat().contains("parquet"))) {
+					PigCompressionImpl pig = new PigCompressionImpl();
+					pig.compressData(conf);
+				}
 			}
-			
 			
 			IShell shell = new ShellImpl();
 			shell.shellToHDFS(conf);

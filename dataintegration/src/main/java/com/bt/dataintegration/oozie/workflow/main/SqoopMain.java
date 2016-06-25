@@ -5,12 +5,12 @@ import java.util.LinkedList;
 
 import static com.bt.dataintegration.constants.Constants.*;
 
-import com.bt.dataintegration.oozie.workflow.tags.ActionSqoopImport;
+import com.bt.dataintegration.oozie.workflow.tags.ActionSqoopTag;
 import com.bt.dataintegration.oozie.workflow.tags.ErrorTo;
 import com.bt.dataintegration.oozie.workflow.tags.GlobalConfiguration;
 import com.bt.dataintegration.oozie.workflow.tags.GlobalConfigurationProperty;
 import com.bt.dataintegration.oozie.workflow.tags.OkTo;
-import com.bt.dataintegration.oozie.workflow.tags.SqoopImport;
+import com.bt.dataintegration.oozie.workflow.tags.SqoopTag;
 import com.bt.dataintegration.property.config.HadoopConfig;
 
 /**
@@ -19,8 +19,8 @@ import com.bt.dataintegration.property.config.HadoopConfig;
  */
 public class SqoopMain{
 
-	private SqoopImport sqoopImport = new SqoopImport();
-	private ActionSqoopImport actSqoop = new ActionSqoopImport();
+	private SqoopTag sqoopTag = new SqoopTag();
+	private ActionSqoopTag actSqoop = new ActionSqoopTag();
 	private LinkedList<String> args = new LinkedList<String>();
 	private ArrayList<String> files = new ArrayList<String>();
 	private OkTo okt = new OkTo();
@@ -28,11 +28,13 @@ public class SqoopMain{
 	private GlobalConfiguration conf = new GlobalConfiguration();
 	private GlobalConfigurationProperty prop = new GlobalConfigurationProperty();
 	
-	public ActionSqoopImport setSqoopMain(HadoopConfig hconf) {
+	public ActionSqoopTag setSqoopMain(HadoopConfig hconf) {
 		
 		int flag = 0;
-		String whereClause = "${lastModifiedDateColumn} >= to_date('${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['lowerBound']}','DD-MON-YYYY HH24:MI:SS') "
-				+ "and ${lastModifiedDateColumn} < to_date('${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['upperBound']}','DD-MON-YYYY HH24:MI:SS')";
+		String ieFlag = "";
+		ieFlag = hconf.getImport_export_flag();
+		String whereClause = "${lastModifiedDateColumn} >= to_date('${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['lowerBound']}','DD-MM-YYYY HH24:MI:SS') "
+				+ "and ${lastModifiedDateColumn} < to_date('${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['upperBound']}','DD-MM-YYYY HH24:MI:SS')";
 		String sqoopTargetDir = "${targetDirectory}/"
 				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirYear']}/"
 				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMonth']}/"
@@ -40,20 +42,26 @@ public class SqoopMain{
 				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirHour']}/"
 				+ "${wf:actionData('"+ACTION_REFRESH_LAST_MODIFIED_DATE_VALUE+"')['targetDirMinute']}";
 		
-		if(hconf.getDirectMode().equalsIgnoreCase("true")) {
-			flag = 1;
-		}
-		
+		if("1".equalsIgnoreCase(hconf.getImport_export_flag())) {
+			
+			if(hconf.getDirectMode().equalsIgnoreCase("true")) {
+				flag = 1;
+			}
+		}		
 		prop.setName(SQOOP_CREDS_PARAM);
 		prop.setValue("${pwd_provider_path}");
 		conf.setProperty(prop);
 		
-		sqoopImport.setXmlns(SQOOP_XMLNS);
-		sqoopImport.setJobTracker("${jobTracker}");
-		sqoopImport.setNameNode("${nameNode}");
-		sqoopImport.setConfiguration(conf);
+		sqoopTag.setXmlns(SQOOP_XMLNS);
+		sqoopTag.setJobTracker("${jobTracker}");
+		sqoopTag.setNameNode("${nameNode}");
+		sqoopTag.setConfiguration(conf);
 		
-		args.add("import");		
+		if(SQOOP_IMPORT.equalsIgnoreCase(ieFlag)) {
+			args.add("import");
+		} else if(SQOOP_EXPORT.equalsIgnoreCase(ieFlag)) {
+			args.add("export");
+		}			
 		if(flag == 1)
 			args.add("--direct");
 		args.add("--connect");
@@ -63,6 +71,7 @@ public class SqoopMain{
 		args.add("--password-alias");
 		args.add("${password_alias}");
 		args.add("--table");
+		if(SQOOP_IMPORT.equalsIgnoreCase(ieFlag)){
 		args.add("${sqoopTableName}");
 		args.add("--columns");
 		args.add("${sqoopColumns}");
@@ -88,24 +97,57 @@ public class SqoopMain{
 		}
 		args.add("${sqoopFileFormat}");
 		
+
+		okt.setOkt(ACTION_PIG_COMPRESS);
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
+		actSqoop.setName(ACTION_SQOOP_IMPORT);
+		}
+		if("2".equalsIgnoreCase(ieFlag)) {
+			args.add("${tableName}");
+			args.add("--export-dir");
+			if("".equalsIgnoreCase(hconf.getExport_user_dir())) {
+				args.add(TEMP_FS);
+			} else {
+				args.add("${export_user_dir}");
+			}						
+			if((hconf.getUpdate_key_column() != null) && (hconf.getUpdate_mode() != null)) {
+				args.add("--update-key");
+				args.add("${update_key_column}");
+				args.add("--update-mode");
+				args.add("${update_mode}");
+			}
+			args.add("--fields-terminated-by");
+			args.add("${fieldSeparator}");
+			args.add("--input-null-string");
+			args.add("${input_null_string}");
+			args.add("--input-null-non-string");
+			args.add("${input_null_non_string_column}");
+			if("".equalsIgnoreCase(hconf.getExport_user_dir())) {
+				okt.setOkt(ACTION_FS_DELETE);
+			} else {
+				okt.setOkt(ACTION_CAPTURE_AUDIT_LOGS);
+			}			
+			//ert.setErt("EMAIL_FAILURE");
+			ert.setErt(ACTION_CAPTURE_ERROR_LOGS);			
+			actSqoop.setName(ACTION_SQOOP_EXPORT_TO_RDBMS_TABLE);
+		}
 		if(!hconf.getNumOfMappers().equals("0")) {
 			args.add("-m");
 			args.add("${numOfMappers}");
 		}
-		
 		files.add("${oraJarPath}");				
 		
-		sqoopImport.setArgs(args);
-		sqoopImport.setFiles(files);
+		sqoopTag.setArgs(args);
+		sqoopTag.setFiles(files);
 		
 		//okt.setOkt("COMPRESS_AVRO_DATA_FOR_" + hconf.getTableName());
 		//okt.setOkt("REFRESH_LAST_MODIFIED_DATE_VALUE_FILE");
-		okt.setOkt(ACTION_PIG_COMPRESS);
+	
 		//ert.setErt("EMAIL_FAILURE");
-		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
 		
-		actSqoop.setName(ACTION_SQOOP_IMPORT);
-		actSqoop.setSqImport(sqoopImport);
+		
+		
+		actSqoop.setSqTag(sqoopTag);
 		actSqoop.setOkTo(okt);
 		actSqoop.setErrorTo(ert);
 		

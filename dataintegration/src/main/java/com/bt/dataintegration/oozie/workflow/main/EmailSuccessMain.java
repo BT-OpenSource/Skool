@@ -1,6 +1,6 @@
 package com.bt.dataintegration.oozie.workflow.main;
 
-import static com.bt.dataintegration.constants.Constants.*;
+import com.bt.dataintegration.constants.Constants;
 import com.bt.dataintegration.oozie.workflow.tags.ActionEmailNotification;
 import com.bt.dataintegration.oozie.workflow.tags.EmailNotification;
 import com.bt.dataintegration.oozie.workflow.tags.ErrorTo;
@@ -11,7 +11,7 @@ import com.bt.dataintegration.property.config.HadoopConfig;
  * @author 609349708
  *	(Abhinav Meghmala)
  */
-public class EmailSuccessMain {
+public class EmailSuccessMain implements Constants {
 
 	private EmailNotification notifySuccess = new EmailNotification();
 	private ActionEmailNotification actSuccess = new ActionEmailNotification();
@@ -25,7 +25,7 @@ public class EmailSuccessMain {
 		String emailBody = "";
 		if(conf.getImport_export_flag().equals(FILE_IMPORT)){
 		emailBody = "Hi,\n\n${wf:id()} : ${wf:name()} completed successfully !\n"
-				+ "Number of Records Processed = ${hadoop:counters(\""+ACTION_RECORD_VALIDATIONS+"\")[\"RECORD_WRITTEN\"]}\n\n"
+				+ "Number of Records Processed = ${hadoop:counters(\"RECORD_VALIDATIONS\")[\"RECORD_WRITTEN\"]}\n\n"
 					+ "This is an auto-generated email.\nPlease do not reply to this email.\n\n"
 					+ "Thanks,\nDSS\nBig Data Team.";
 		}
@@ -34,6 +34,11 @@ public class EmailSuccessMain {
 				+ "Number of Records Fetched = ${hadoop:counters(\""+sqoopAction+"\")[\"org.apache.hadoop.mapred.Task$Counter\"][\"MAP_OUTPUT_RECORDS\"]}\n\n"
 					+ "This is an auto-generated email.\nPlease do not reply to this email.\n\n"
 					+ "Thanks,\nDSS\nBig Data Team.";
+		} else if(conf.getImport_export_flag().equals(SQOOP_EXPORT)) {
+			emailBody = "Hi,\n\n${wf:id()} : ${wf:name()} completed successfully !\n"
+						+ "Total Number Of Records Exported - ${hadoop:counters(\"SQOOP_EXPORT_TO_RDBMS_TABLE\")[\"org.apache.hadoop.mapred.Task$Counter\"][\"MAP_OUTPUT_RECORDS\"]}"
+						+ "\nThis is an auto-generated email.\nPlease do not reply to this email.\n\n"
+						+ "Thanks,\nDSS\nBig Data Team.";
 		}
 		notifySuccess.setXmlns(EMAIL_XMLNS);
 		notifySuccess.setBody(emailBody);

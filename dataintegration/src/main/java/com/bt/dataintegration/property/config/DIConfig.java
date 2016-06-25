@@ -22,7 +22,7 @@ import com.bt.dataintegration.utilities.Utility;
 
 //import com.bt.tab.hadoop.hive.jdbc.test.HiveConnect;
 
-public class DIConfig implements Constants{
+public class DIConfig implements Constants {
 	final static Logger logger = Logger.getLogger(DIConfig.class);
 	private String envDetails;
 	private String tableName;
@@ -52,17 +52,17 @@ public class DIConfig implements Constants{
 	private String jobTracker;
 	private String sqoopFileFormat;
 	private String sourceName;
-	
+
 	private String hiveJdbcDriver;
 	private String connString;
 	private String serviceName;
 	private String clusterUsername;
 	private String clusterPassword;
-	//private String landingDirectory;
-	//private String workspaceDirectory;
+	// private String landingDirectory;
+	// private String workspaceDirectory;
 	private boolean coordinatorFlag;
 	private String instanceName;
-	
+
 	private boolean incremental;
 	private String incrementalMode;
 	private String checkColumn;
@@ -71,34 +71,41 @@ public class DIConfig implements Constants{
 	private int numOfMapper;
 	private int retentionRawData;
 	private int retentionProcessedData;
-	//For Table Export
-	
+	// compression related atribute
+	private boolean compressionRequired;
+	private String comressionCodec;
+
+	// For Table Export
+
 	private String exportDir;
-	private String updateKeyColumn ; 
+	private String updateKeyColumn;
 	private String updateMode;
-	private String input_null_string ;
-	private String input_null_non_string ;
-	private String stagingTable;   
+	private String input_null_string;
+	private String input_null_non_string;
+	private String stagingTable;
 	private String import_export_flag;
 	private boolean stagingRequired;
 	private boolean updateDatabase;
 	private String fieldSeparator;
 	private String lineSeparator;
-	//private String direct_flag ;
-	//private String num_mappers;  
-	//private String stored_procedure_name ; 
-	//private String clear_staging_table;   
-	//private String batch_mode;
-	//private String columns_name ;
-	
-	
-	
-	private String concurrency ;
-	private String throttle ;
-	private String frequency ;
-	private String timeout ;
-	
-	//attributes required for Filesystem
+	private String hive_database_name;
+	private String export_hive_table;
+	private String date_timestamp_column;
+	private String table_part_colname;
+	private String hive_export_query;
+	// private String direct_flag ;
+	// private String num_mappers;
+	// private String stored_procedure_name ;
+	// private String clear_staging_table;
+	// private String batch_mode;
+	// private String columns_name ;
+
+	private String concurrency;
+	private String throttle;
+	private String frequency;
+	private String timeout;
+
+	// attributes required for Filesystem
 	private String hiveTable;
 	private String fileDirectory;
 	private String fileDelimeter;
@@ -113,60 +120,153 @@ public class DIConfig implements Constants{
 	private int lineNumberData;
 	private String interimLandingDir;
 	private String landingDirectory;
+	
+	private String cronParams;
+	private String pollingFrequency;
+	private String slaStart;
+	private String slaEnd;
+	private String slaContact;
+	private boolean isSlaRequired = false;
+	
+	public boolean isSlaRequired() {
+		return isSlaRequired;
+	}
+
+	public void setSlaRequired(boolean isSlaRequired) {
+		this.isSlaRequired = isSlaRequired;
+	}
+
+	public String getSlaStart() {
+		return slaStart;
+	}
+
+	public String getSlaEnd() {
+		return slaEnd;
+	}
+
+	public String getSlaContact() {
+		return slaContact;
+	}
+
+	public void setSlaStart(String slaStart) {
+		this.slaStart = slaStart;
+	}
+
+	public void setSlaEnd(String slaEnd) {
+		this.slaEnd = slaEnd;
+	}
+
+	public void setSlaContact(String slaContact) {
+		this.slaContact = slaContact;
+	}
+
+	public String getPollingFrequency() {
+		return pollingFrequency;
+	}
+
+	public void setPollingFrequency(String pollingFrequency) {
+		this.pollingFrequency = pollingFrequency;
+	}
+
+	public String getCronParams() {
+		return cronParams;
+	}
+
+	public void setCronParams(String cronParams) {
+		this.cronParams = cronParams;
+	}
+
 	public DIConfig() {
 		super();
 	}
-	
 
+	public boolean isCompressionRequired() {
+		return compressionRequired;
+	}
 
+	public void setCompressionRequired(boolean compressionRequired) {
+		this.compressionRequired = compressionRequired;
+	}
+
+	public String getComressionCodec() {
+		return comressionCodec;
+	}
+
+	public void setComressionCodec(String comressionCodec) {
+		this.comressionCodec = comressionCodec;
+	}
+
+	public String getHive_export_query() {
+		return hive_export_query;
+	}
+
+	public void setHive_export_query(String hive_export_query) {
+		this.hive_export_query = hive_export_query;
+	}
+
+	public String getTable_part_colname() {
+		return table_part_colname;
+	}
+
+	public void setTable_part_colname(String table_part_colname) {
+		this.table_part_colname = table_part_colname;
+	}
+
+	public String getDate_timestamp_column() {
+		return date_timestamp_column;
+	}
+
+	public void setDate_timestamp_column(String date_timestamp_column) {
+		this.date_timestamp_column = date_timestamp_column;
+	}
+
+	public String getHive_database_name() {
+		return hive_database_name;
+	}
+
+	public void setHive_database_name(String hive_database_name) {
+		this.hive_database_name = hive_database_name;
+	}
+
+	public String getExport_hive_table() {
+		return export_hive_table;
+	}
+
+	public void setExport_hive_table(String export_hive_table) {
+		this.export_hive_table = export_hive_table;
+	}
 
 	public String getLandingDirectory() {
 		return landingDirectory;
 	}
 
-
-
-
 	public void setLandingDirectory(String landingDirectory) {
 		this.landingDirectory = landingDirectory;
 	}
-
-
-
 
 	public String getInterimLandingDir() {
 		return interimLandingDir;
 	}
 
-
-
-
 	public void setInterimLandingDir(String interimLandingDir) {
 		this.interimLandingDir = interimLandingDir;
 	}
-
-
-
 
 	public String getFileHeaderKeyword() {
 		return fileHeaderKeyword;
 	}
 
-
 	public void setFileHeaderKeyword(String fileHeaderKeyword) {
 		this.fileHeaderKeyword = fileHeaderKeyword;
 	}
-
 
 	public boolean isFileTrailerPresent() {
 		return fileTrailerPresent;
 	}
 
-
 	public void setFileTrailerPresent(boolean fileTrailerPresent) {
 		this.fileTrailerPresent = fileTrailerPresent;
 	}
-
 
 	public String getFileTrailerKeyword() {
 		return fileTrailerKeyword;
@@ -215,7 +315,7 @@ public class DIConfig implements Constants{
 	public void setInput_null_non_string(String input_null_non_string) {
 		this.input_null_non_string = input_null_non_string;
 	}
-	
+
 	public String getExportDir() {
 		return exportDir;
 	}
@@ -248,7 +348,6 @@ public class DIConfig implements Constants{
 		this.stagingTable = stagingTable;
 	}
 
-	
 	public String getTableName() {
 		return tableName;
 	}
@@ -296,7 +395,6 @@ public class DIConfig implements Constants{
 	public String getClusterPassword() {
 		return clusterPassword;
 	}
-
 
 	public String getInstanceName() {
 		return instanceName;
@@ -350,24 +448,26 @@ public class DIConfig implements Constants{
 		this.clusterPassword = clusterPassword;
 	}
 
-
 	public void setInstanceName(String instanceName) {
 		this.instanceName = instanceName;
 	}
+
 	public void setSourceUsername(String sourceUsername) {
 		this.sourceUsername = sourceUsername;
 	}
+
 	public String getSourceUsername() {
 		return this.sourceUsername;
 	}
+
 	public void setSourcePassword(String sourcePassword) {
 		this.sourcePassword = sourcePassword;
 	}
+
 	public String getSourcePassword() {
 		return this.sourcePassword;
 	}
-	
-	
+
 	public boolean isIncremental() {
 		return incremental;
 	}
@@ -391,8 +491,6 @@ public class DIConfig implements Constants{
 	public void setCheckColumn(String checkColumn) {
 		this.checkColumn = checkColumn;
 	}
-
-	
 
 	public String getLastValue() {
 		return lastValue;
@@ -418,7 +516,6 @@ public class DIConfig implements Constants{
 		this.numOfMapper = numOfMapper;
 	}
 
-	
 	public String getDBDriver() {
 		return DBDriver;
 	}
@@ -443,7 +540,6 @@ public class DIConfig implements Constants{
 		DBCatalog = dBCatalog;
 	}
 
-	
 	public String getWfStartTime() {
 		return wfStartTime;
 	}
@@ -484,7 +580,6 @@ public class DIConfig implements Constants{
 		this.failureEmailId = failureEmailId;
 	}
 
-	
 	public boolean isDirect() {
 		return direct;
 	}
@@ -493,7 +588,6 @@ public class DIConfig implements Constants{
 		this.direct = direct;
 	}
 
-	
 	public String getLastModifiedDateColumn() {
 		return lastModifiedDateColumn;
 	}
@@ -501,8 +595,6 @@ public class DIConfig implements Constants{
 	public void setLastModifiedDateColumn(String lastModifiedDateColumn) {
 		this.lastModifiedDateColumn = lastModifiedDateColumn;
 	}
-	
-	
 
 	public String getEnvDetails() {
 		return envDetails;
@@ -511,7 +603,6 @@ public class DIConfig implements Constants{
 	public void setEnvDetails(String envDetails) {
 		this.envDetails = envDetails;
 	}
-
 
 	public String getHive2_jdbc_url() {
 		return hive2_jdbc_url;
@@ -529,7 +620,6 @@ public class DIConfig implements Constants{
 		this.hive2_server_principal = hive2_server_principal;
 	}
 
-	
 	public String getAppNameNode() {
 		return appNameNode;
 	}
@@ -594,8 +684,6 @@ public class DIConfig implements Constants{
 		this.frequency = frequency;
 	}
 
-	
-
 	public boolean isCoordinatorFlag() {
 		return coordinatorFlag;
 	}
@@ -604,7 +692,6 @@ public class DIConfig implements Constants{
 		this.coordinatorFlag = coordinatorFlag;
 	}
 
-	
 	public int getRetentionRawData() {
 		return retentionRawData;
 	}
@@ -621,7 +708,6 @@ public class DIConfig implements Constants{
 		this.retentionProcessedData = retentionProcessedData;
 	}
 
-	
 	public String getTableOwner() {
 		return tableOwner;
 	}
@@ -630,7 +716,6 @@ public class DIConfig implements Constants{
 		this.tableOwner = tableOwner;
 	}
 
-	
 	public String getSourceName() {
 		return sourceName;
 	}
@@ -639,7 +724,6 @@ public class DIConfig implements Constants{
 		this.sourceName = sourceName;
 	}
 
-	
 	public boolean isStagingRequired() {
 		return stagingRequired;
 	}
@@ -671,7 +755,7 @@ public class DIConfig implements Constants{
 	public void setLineSeparator(String lineSeparator) {
 		this.lineSeparator = lineSeparator;
 	}
-	
+
 	public String getHiveTable() {
 		return hiveTable;
 	}
@@ -703,8 +787,6 @@ public class DIConfig implements Constants{
 	public void setFileMask(String fileMask) {
 		this.fileMask = fileMask;
 	}
-	
-	
 
 	public double getThreshold() {
 		return threshold;
@@ -714,7 +796,6 @@ public class DIConfig implements Constants{
 		this.threshold = threshold;
 	}
 
-	
 	public String getFileDateFormat() {
 		return fileDateFormat;
 	}
@@ -722,7 +803,7 @@ public class DIConfig implements Constants{
 	public void setFileDateFormat(String fileDateFormat) {
 		this.fileDateFormat = fileDateFormat;
 	}
-	
+
 	public String getControlFileName() {
 		return controlFileName;
 	}
@@ -732,576 +813,745 @@ public class DIConfig implements Constants{
 	}
 
 	public DIConfig getDIConfigProperties() {
-		
+
 		Properties properties = null;
 		InputStream ips = null;
-		//final String conffileName = "configuration.properties"; 
+		// final String conffileName = "configuration.properties";
 		DIConfig confObj = new DIConfig();
-		
+
 		try {
-			
+
 			properties = new Properties();
-			//ips = DIConfig.class.getClassLoader().getResourceAsStream(conffileName);
+			// ips =
+			// DIConfig.class.getClassLoader().getResourceAsStream(conffileName);
 			ips = new FileInputStream(CONFIGURATION_PROPERTIES_FILE);
 			properties.load(ips);
-			
+
 		} catch (Exception e) {
 			logger.error("Error loading properties");
 			logger.error(e);
 			throw new Error(e);
-			
+
 		}
 
-			confObj.setImport_export_flag(properties.getProperty("import_export_file_flag"));
-			if(confObj.getImport_export_flag() == null || "".equals(confObj.getImport_export_flag())){
-				logger.error("please provide import_export_flag");
-				throw new Error();
-			}	
+		confObj.setImport_export_flag(properties
+				.getProperty("import_export_file_flag"));
+		String ieFlag = "";
+		if (confObj.getImport_export_flag() == null
+				|| "".equals(confObj.getImport_export_flag())) {
+			logger.error("please provide import_export_flag");
+			throw new Error();
+		} else
+			ieFlag = confObj.getImport_export_flag();
+
+		try {
+			confObj.setInstanceName(properties
+					.getProperty("hdfs_instance_name"));
+		} catch (NullPointerException e) {
+			logger.error("please provide hdfs_instance_name");
+			throw new Error(e);
+		}
+		if ("".equals(confObj.getInstanceName())) {
+			logger.error("please provide cluster_haas_instance_name");
+			throw new Error();
+		}
+
+		confObj.setSourceName(properties.getProperty("source_name"));
+		if (confObj.getSourceName() == null
+				|| "".equals(confObj.getSourceName())) {
+			logger.error("please provide source_name");
+			throw new Error();
+		}
+
+		confObj.setConcurrency(properties.getProperty("concurrency"));
+		if (confObj.getConcurrency() == null
+				|| "".equals(confObj.getConcurrency())) {
+			logger.info("By default setting concurrency to 1");
+			confObj.setConcurrency("1");
+		}
+		confObj.setThrottle(properties.getProperty("throttle"));
+		if (confObj.getThrottle() == null || "".equals(confObj.getThrottle())) {
+			logger.info("By default setting throttle to 1");
+			confObj.setThrottle("1");
+		}
+		confObj.setTimeout(properties.getProperty("timeout"));
+		if (confObj.getTimeout() == null || "".equals(confObj.getTimeout())) {
+			logger.info("By default setting timeout to 0");
+			confObj.setTimeout("0");
+		}
+		String coordFlag = properties.getProperty("coordinator_required");
+		
+		if (coordFlag == null || "".equals(coordFlag)) {
+			logger.info("By default setting coordinator_required to false");
+			confObj.setCoordinatorFlag(false);
+		} else {
+			if ("true".equalsIgnoreCase(coordFlag))
+				confObj.setCoordinatorFlag(true);
+			else if ("false".equalsIgnoreCase(coordFlag))
+				confObj.setCoordinatorFlag(false);
+		}
+		
+		confObj.setFrequency(properties.getProperty("frequency"));
+		if (confObj.isCoordinatorFlag() && "".equalsIgnoreCase(confObj.getFrequency())) {
 			
-			try{
-				confObj.setInstanceName(properties.getProperty("hdfs_instance_name").toUpperCase());
-				}catch(NullPointerException e){
-					logger.error("please provide hdfs_instance_name");
+			String cronParameter = properties.getProperty("cron_frequency");
+			if(cronParameter == null || "".equalsIgnoreCase(cronParameter)){
+				logger.error("Incorrect cron type argument. By default setting frequency to 1440 minutes");	
+				confObj.setFrequency("1440");
+			} else {
+				confObj.setFrequency(cronParameter);
+			}
+		}		
+		/*if ("".equals(confObj.getFrequency()) && ("".equalsIgnoreCase(confObj.getCronParams()))) {
+			logger.info("By default setting frequency to 1440");
+			confObj.setFrequency("1440");
+		}*/		
+		/*
+		 * confObj.setAppNameNode(properties.getProperty("appNameNode"));
+		 * if(confObj.getAppNameNode() == null ||
+		 * "".equals(confObj.getAppNameNode())){
+		 * logger.error("please provide appNameNode"); throw new Error(); }
+		 * confObj
+		 * .setWorkflowNameNode(properties.getProperty("workflowNameNode"));
+		 * if(confObj.getWorkflowNameNode() == null ||
+		 * "".equals(confObj.getWorkflowNameNode())){
+		 * logger.error("please provide workflowNameNode"); throw new Error(); }
+		 */
+		confObj.setAppNameNode(properties.getProperty("NameNode"));
+		if (confObj.getAppNameNode() == null
+				|| "".equals(confObj.getAppNameNode())) {
+			logger.error("please provide NameNode");
+			throw new Error();
+		}
+		confObj.setWorkflowNameNode(confObj.getAppNameNode());
+
+		if (confObj.isCoordinatorFlag()) {
+			confObj.setWfStartTime(properties
+					.getProperty("workflow_start_time"));
+			if (confObj.getWfStartTime() == null
+					|| "".equals(confObj.getWorkflowNameNode())) {
+				logger.error("please provide workflow_start_time");
+				throw new Error();
+			}
+
+			confObj.setWfEndTime(properties.getProperty("workflow_end_time"));
+			if (confObj.getWfEndTime() == null
+					|| "".equals(confObj.getWorkflowNameNode())) {
+				logger.error("please provide workflow_end_time");
+				throw new Error();
+			}
+
+			confObj.setTimeZone(properties.getProperty("time_zone"));
+			if (confObj.getTimeZone() == null
+					|| "".equals(confObj.getTimeZone())) {
+				logger.error("please provide time_zone");
+				throw new Error();
+			}
+		}
+		confObj.setSuccessEmailId(properties.getProperty("success_email_id"));
+		if (confObj.getSuccessEmailId() == null
+				|| "".equals(confObj.getSuccessEmailId())) {
+			logger.error("please provide success_email_id");
+			throw new Error();
+		}
+
+		confObj.setFailureEmailId(properties.getProperty("failure_email_id"));
+		if (confObj.getFailureEmailId() == null
+				|| "".equals(confObj.getFailureEmailId())) {
+			logger.error("please provide failure_email_id");
+			throw new Error();
+		}
+
+		confObj.setJobTracker(properties.getProperty("jobTracker"));
+		if (confObj.getJobTracker() == null
+				|| "".equals(confObj.getJobTracker())) {
+			logger.error("please provide jobTracker");
+			throw new Error();
+		}
+
+		confObj.setEnvDetails(properties.getProperty("Environment_Details"));
+		if (confObj.getEnvDetails() == null
+				|| "".equals(confObj.getEnvDetails())) {
+			logger.info("By default environement is considered to be cluster");
+			confObj.setEnvDetails("1");
+		}
+
+		confObj.setHive2_jdbc_url(properties.getProperty("hive2_jdbc_url"));
+		if (confObj.getHive2_jdbc_url() == null
+				|| "".equals(confObj.getHive2_jdbc_url())) {
+			logger.error("please provide hive2_jdbc_url");
+			throw new Error();
+		}
+		confObj.setHive2_server_principal(properties
+				.getProperty("hive2_server_principal"));
+		if (confObj.getHive2_server_principal() == null
+				|| "".equals(confObj.getHive2_server_principal())) {
+			logger.error("please provide hive2_server_principal");
+			throw new Error();
+		}
+
+		confObj.setHiveJdbcDriver(HIVE_JDBC_DRIVER_NAME);
+
+		if (!ieFlag.equalsIgnoreCase(SQOOP_EXPORT)) {
+			confObj.setInterimLandingDir(properties
+					.getProperty("interim_landing_directory"));
+			if (confObj.getInterimLandingDir() == null) {
+				logger.error("Please provide interim_landing_directory");
+				throw new Error();
+			}
+
+			String compReq = properties.getProperty("compression_required");
+			if ((compReq == null) || ("".equals(compReq))) {
+				logger.error("Please provide compression_required");
+				throw new Error();
+			}
+
+			if ("true".equals(compReq)) {
+				confObj.setCompressionRequired(true);
+			} else {
+				confObj.setCompressionRequired(false);
+			}
+
+			String compCodec = properties.getProperty("compression_codec");
+			if ((confObj.isCompressionRequired() == true)
+					&& ((compCodec == null) || ("".equals(compCodec)))) {
+				logger.error("Please provide compression_codec");
+				throw new Error();
+			} else if (confObj.isCompressionRequired() == true) {
+				if ("1".equalsIgnoreCase(compCodec)) {
+					confObj.setComressionCodec(SNAPPY_COMPRESSION_CODEC);
+				}
+				if ("2".equalsIgnoreCase(compCodec)) {
+					confObj.setComressionCodec(BZIP2_COMPRESSION_CODEC);
+				}
+				if ("3".equalsIgnoreCase(compCodec)) {
+					confObj.setComressionCodec(GZIP_COMPRESSION_CODEC);
+				}
+			}
+
+		}
+
+		// ***************common properties set for both import and
+		// export********************//
+
+		if (!ieFlag.equalsIgnoreCase(FILE_IMPORT)) {
+
+			confObj.setSourceHostName(properties.getProperty("database_host"));
+			if (confObj.getSourceHostName() == null
+					|| "".equals(confObj.getSourceHostName())) {
+				logger.error("please provide source_database_host");
+				throw new Error();
+			}
+
+			confObj.setSourcePort(properties.getProperty("datebase_port"));
+			if (confObj.getSourcePort() == null
+					|| "".equals(confObj.getSourcePort())) {
+				logger.error("please provide source_datebase_port");
+				throw new Error();
+			}
+
+			try {
+				confObj.setSourceSid(properties.getProperty(
+						"database_sid_or_servicename").toUpperCase());
+			} catch (NullPointerException e) {
+				logger.error("please provide source_database_sid");
+				throw new Error(e);
+			}
+			if ("".equals(confObj.getSourceSid())) {
+				logger.error("please provide source_database_sid");
+				throw new Error();
+			}
+			try {
+				confObj.setSourceUsername(properties.getProperty(
+						"database_username").toUpperCase());
+			} catch (NullPointerException e) {
+				logger.error("please provide source_database_username");
+				throw new Error(e);
+			}
+			if ("".equals(confObj.getSourceUsername())) {
+				logger.error("please provide source_database_username");
+				throw new Error();
+			}
+			try {
+				confObj.setTableOwner(properties.getProperty(
+						"database_schemaname").toUpperCase());
+			} catch (NullPointerException e) {
+				logger.error("please provide source_database_schemaname");
+				throw new Error(e);
+			}
+			if ("".equals(confObj.getTableOwner())) {
+				logger.error("please provide source_database_schemaname");
+				throw new Error();
+			}
+
+			// Password will be taken form the user and will be stored in
+			// encrypted fashion in HDFS
+			/*
+			 * confObj.setSourcePassword(properties.getProperty("database_password"
+			 * )); if(confObj.getSourcePassword() == null ||
+			 * "".equals(confObj.getSourcePassword())){
+			 * logger.error("please provide source_database_password"); throw
+			 * new Error(); }
+			 */
+
+			try {
+				confObj.setTableName(properties.getProperty(
+						"database_tablename").toUpperCase());
+			} catch (NullPointerException e) {
+				logger.error("please provide source_database_tablename");
+				throw new Error(e);
+			}
+
+			if ("".equals(confObj.getTableName())) {
+				logger.error("please provide database_tablename");
+				throw new Error();
+			}
+
+			confObj.setDBDriver(properties.getProperty("DBDriver"));
+			if (confObj.getDBDriver() == null
+					|| "".equals(confObj.getDBDriver())) {
+				logger.error("please provide DBDriver");
+				throw new Error();
+			}
+			try {
+				confObj.setNumOfMapper(Integer.parseInt(properties
+						.getProperty("no_of_mappers")));
+			} catch (NullPointerException e) {
+				/*
+				 * logger.error("please provide split_by_column"); throw new
+				 * Error(e);
+				 */
+				// logger.info("by default");
+				confObj.setNumOfMapper(0);
+			} catch (IllegalArgumentException e) {
+				if (!(properties.getProperty("no_of_mappers"))
+						.equalsIgnoreCase("")) {
+					logger.error("Please provide number for mappers in integers. To have default value leave the field blank");
+					logger.error("", e);
 					throw new Error(e);
-				}
-			if("".equals(confObj.getInstanceName())){
-				logger.error("please provide cluster_haas_instance_name");
-				throw new Error();
-			}
-			
-			confObj.setSourceName(properties.getProperty("source_name"));
-			if(confObj.getSourceName() == null || "".equals(confObj.getSourceName())){
-				logger.error("please provide source_name");
-				throw new Error();
-			}
-			
-			confObj.setConcurrency(properties.getProperty("concurrency"));
-            if(confObj.getConcurrency() == null || "".equals(confObj.getConcurrency())){
-                           logger.info("By default setting concurrency to 1");
-                           confObj.setConcurrency("1");
-            }
-            confObj.setThrottle(properties.getProperty("throttle"));
-            if(confObj.getThrottle() == null || "".equals(confObj.getThrottle())){
-                           logger.info("By default setting throttle to 1");
-                           confObj.setThrottle("1");
-            }
-            confObj.setTimeout(properties.getProperty("timeout"));
-            if(confObj.getTimeout() == null || "".equals(confObj.getTimeout())){
-                           logger.info("By default setting timeout to 0");
-                           confObj.setTimeout("0");
-            }
-            confObj.setFrequency(properties.getProperty("frequency"));
-            if(confObj.getFrequency() == null || "".equals(confObj.getFrequency())){
-                           logger.info("By default setting frequency to 14400");
-                           confObj.setFrequency("1440");
-            }
-            String coordFlag = properties.getProperty("coordinator_required");
-            if(coordFlag == null || "".equals(coordFlag)){
-                           logger.info("By default setting coordinator_required to false");
-                           confObj.setCoordinatorFlag(false);
-            }
-            else{
-            	if("true".equalsIgnoreCase(coordFlag))
-            		confObj.setCoordinatorFlag(true);
-            	else if("false".equalsIgnoreCase(coordFlag))
-            		confObj.setCoordinatorFlag(false);
-            }
-            
-            /*confObj.setAppNameNode(properties.getProperty("appNameNode"));
-			if(confObj.getAppNameNode() == null || "".equals(confObj.getAppNameNode())){
-				logger.error("please provide appNameNode");
-				throw new Error();
-			}
-			confObj.setWorkflowNameNode(properties.getProperty("workflowNameNode"));
-			if(confObj.getWorkflowNameNode() == null || "".equals(confObj.getWorkflowNameNode())){
-				logger.error("please provide workflowNameNode");
-				throw new Error();
-			}*/
-            confObj.setAppNameNode(properties.getProperty("NameNode"));
-			if(confObj.getAppNameNode() == null || "".equals(confObj.getAppNameNode())){
-				logger.error("please provide NameNode");
-				throw new Error();
-			}
-			confObj.setWorkflowNameNode(confObj.getAppNameNode());
-			
-			if(confObj.isCoordinatorFlag()){
-				confObj.setWfStartTime(properties.getProperty("workflow_start_time"));
-				if(confObj.getWfStartTime() == null || "".equals(confObj.getWorkflowNameNode())){
-					logger.error("please provide workflow_start_time");
-					throw new Error();
-				}
-				
-				confObj.setWfEndTime(properties.getProperty("workflow_end_time"));
-				if(confObj.getWfEndTime() == null || "".equals(confObj.getWorkflowNameNode())){
-					logger.error("please provide workflow_end_time");
-					throw new Error();
-				}
-				
-				confObj.setTimeZone(properties.getProperty("time_zone"));
-				if(confObj.getTimeZone() == null || "".equals(confObj.getTimeZone())){
-					logger.error("please provide time_zone");
-					throw new Error();
-				}
-			}
-			confObj.setSuccessEmailId(properties.getProperty("success_email_id"));
-			if(confObj.getSuccessEmailId() == null || "".equals(confObj.getSuccessEmailId())){
-				logger.error("please provide success_email_id");
-				throw new Error();
-			}
-			
-			confObj.setFailureEmailId(properties.getProperty("failure_email_id"));
-			if(confObj.getFailureEmailId() == null || "".equals(confObj.getFailureEmailId())){
-				logger.error("please provide failure_email_id");
-				throw new Error();
-			}
-			
-			confObj.setJobTracker(properties.getProperty("jobTracker"));
-			if(confObj.getJobTracker() == null || "".equals(confObj.getJobTracker())){
-				logger.error("please provide jobTracker");
-				throw new Error();
-			}
-			
-			 confObj.setEnvDetails(properties.getProperty("Environment_Details"));
-				if(confObj.getEnvDetails() == null || "".equals(confObj.getEnvDetails())){
-					logger.info("By default environement is considered to be cluster");
-					confObj.setEnvDetails("1");
-				}
-				
-				confObj.setHive2_jdbc_url(properties.getProperty("hive2_jdbc_url"));
-				if(confObj.getHive2_jdbc_url() == null || "".equals(confObj.getHive2_jdbc_url())){
-					logger.error("please provide hive2_jdbc_url");
-					throw new Error();
-				}
-				confObj.setHive2_server_principal(properties.getProperty("hive2_server_principal"));
-				if(confObj.getHive2_server_principal() == null || "".equals(confObj.getHive2_server_principal())){
-					logger.error("please provide hive2_server_principal");
-					throw new Error();
-				}
-				
-				confObj.setHiveJdbcDriver(HIVE_JDBC_DRIVER_NAME);
-				
-				confObj.setInterimLandingDir(properties.getProperty("interim_landing_directory"));
-				if(confObj.getInterimLandingDir() == null){
-					logger.error("Please provide interim_landing_directory");
-					throw new Error();
-				}
-				String landingDirApp = "";
-				
-				
-			//***************common properties set for both import and export********************//
-			
-            if(!confObj.getImport_export_flag().equalsIgnoreCase("3")){
-            	
-            	
-				confObj.setSourceHostName(properties.getProperty("database_host"));
-				if(confObj.getSourceHostName() == null || "".equals(confObj.getSourceHostName())){
-					logger.error("please provide source_database_host");
-					throw new Error();
-				}	
-				
-				confObj.setSourcePort(properties.getProperty("datebase_port"));
-				if(confObj.getSourcePort() == null || "".equals(confObj.getSourcePort())){
-					logger.error("please provide source_datebase_port");
-					throw new Error();
-				}
-				
-				try{
-					confObj.setSourceSid(properties.getProperty("database_sid_or_servicename").toUpperCase());
-				}
-				catch(NullPointerException e){
-					logger.error("please provide source_database_sid");
-					throw new Error(e);
-				}
-				if("".equals(confObj.getSourceSid())){
-					logger.error("please provide source_database_sid");
-					throw new Error();
-				}
-				try{
-				confObj.setSourceUsername(properties.getProperty("database_username").toUpperCase());
-				}catch(NullPointerException e){
-					logger.error("please provide source_database_username");
-					throw new Error(e);
-				}
-				if("".equals(confObj.getSourceUsername())){
-					logger.error("please provide source_database_username");
-					throw new Error();
-				}
-				try{
-					confObj.setTableOwner(properties.getProperty("database_schemaname").toUpperCase());
-				}catch(NullPointerException e){
-					logger.error("please provide source_database_schemaname");
-					throw new Error(e);
-				}
-				if("".equals(confObj.getTableOwner())){
-					logger.error("please provide source_database_schemaname");
-					throw new Error();
-				}
-				
-				// Password will be taken form the user and will be stored in encrypted fashion in HDFS
-				/*confObj.setSourcePassword(properties.getProperty("database_password"));
-				if(confObj.getSourcePassword() == null || "".equals(confObj.getSourcePassword())){
-					logger.error("please provide source_database_password");
-					throw new Error();
-				}*/				
-				
-				try{
-				confObj.setTableName(properties.getProperty("database_tablename").toUpperCase());
-				}catch(NullPointerException e){
-					logger.error("please provide source_database_tablename");
-					throw new Error(e);
-				}
-				
-				if("".equals(confObj.getTableName())){
-					logger.error("please provide database_tablename");
-					throw new Error();
-				}
-				
-				confObj.setDBDriver(properties.getProperty("DBDriver"));
-				if(confObj.getDBDriver() == null || "".equals(confObj.getDBDriver())){
-					logger.error("please provide DBDriver");
-					throw new Error();
-				}
-				try{
-				confObj.setNumOfMapper(Integer.parseInt(properties.getProperty("no_of_mappers")));
-				}catch(NullPointerException e){
-					/*logger.error("please provide split_by_column");
-					throw new Error(e);*/
-					//logger.info("by default");
+				} else {
 					confObj.setNumOfMapper(0);
 				}
-				catch(IllegalArgumentException e){
-					if(!(properties.getProperty("no_of_mappers")).equalsIgnoreCase("")){
-						logger.error("Please provide number for mappers in integers. To have default value leave the field blank");
-						logger.error("",e);
-						throw new Error(e);
-					}
-					else{
-						confObj.setNumOfMapper(0);
-					}
-						
-				}
-				if("".equals(confObj.getNumOfMapper())){
-					confObj.setNumOfMapper(0);
-				}
-				
-				try{
-					confObj.setRDBMSDetail(Integer.parseInt(properties.getProperty("RDBMS")));
-				}catch(NullPointerException e){
-						logger.error("please provide RDBMS detail");
-						throw new Error(e);
-				}
-				if("".equals(confObj.getRDBMSDetail())){
-					logger.error("please provide RDBMS detail");
-					throw new Error();
-				}
-				
+
+			}
+			if ("".equals(confObj.getNumOfMapper())) {
+				confObj.setNumOfMapper(0);
+			}
+
+			try {
+				confObj.setRDBMSDetail(Integer.parseInt(properties
+						.getProperty("RDBMS")));
+			} catch (NullPointerException e) {
+				logger.error("please provide RDBMS detail");
+				throw new Error(e);
+			}
+			if ("".equals(confObj.getRDBMSDetail())) {
+				logger.error("please provide RDBMS detail");
+				throw new Error();
+			}
+
+			/*
+			 * try{
+			 * confObj.setRetentionProcessedData(Integer.parseInt(properties
+			 * .getProperty("retention_period_processed_data")));
+			 * }catch(NullPointerException e){
+			 * logger.error("please provide split_by_column"); throw new
+			 * Error(e); //logger.info("by default");
+			 * confObj.setRetentionProcessedData(-1); }
+			 * catch(IllegalArgumentException e){
+			 * if(!(properties.getProperty("retention_period_processed_data"
+			 * )).equalsIgnoreCase("")){ logger.error(
+			 * "Please provide retention_period_processed_data in integer");
+			 * logger.error("",e); throw new Error(e); }else{
+			 * confObj.setRetentionProcessedData(-1); } }
+			 */
+
+			// properties only for import
+			if (ieFlag.equalsIgnoreCase(SQOOP_IMPORT)) {
+
 				String fileFormat = properties.getProperty("FileFormat");
-				if(fileFormat == null || "".equals(fileFormat)){
+				if (fileFormat == null || "".equals(fileFormat)) {
 					logger.info("By default keeping the file format as avro");
 					fileFormat = "1";
 				}
-				if(fileFormat.equalsIgnoreCase("1")){
+				if (fileFormat.equalsIgnoreCase("1")) {
 					confObj.setSqoopFileFormat("avrodatafile");
-				}
-				else if(fileFormat.equalsIgnoreCase("2")){
+				} else if (fileFormat.equalsIgnoreCase("2")) {
 					confObj.setSqoopFileFormat("textfile");
-				}
-				else if(fileFormat.equalsIgnoreCase("3")){
+				} else if (fileFormat.equalsIgnoreCase("3")) {
 					confObj.setSqoopFileFormat("sequencefile");
-				}
-				else if(fileFormat.equalsIgnoreCase("4")){
+				} else if (fileFormat.equalsIgnoreCase("4")) {
 					confObj.setSqoopFileFormat("parquetfile");
 				}
-				
-	           /* try{
-	    			confObj.setRetentionProcessedData(Integer.parseInt(properties.getProperty("retention_period_processed_data")));
-	    		}catch(NullPointerException e){
-					logger.error("please provide split_by_column");
-					throw new Error(e);
-					//logger.info("by default");
-					confObj.setRetentionProcessedData(-1);
-	    		}
-	            catch(IllegalArgumentException e){
-	            	if(!(properties.getProperty("retention_period_processed_data")).equalsIgnoreCase("")){
-		            	logger.error("Please provide retention_period_processed_data in integer");
-		            	logger.error("",e);
-		            	throw new Error(e);
-		            }else{
-		        		confObj.setRetentionProcessedData(-1);
-		        	}
-	            }*/
+
+				String landingDirApp = "";
 				String interimDir = confObj.getInterimLandingDir();
-				if("".equals(interimDir)){
-					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
-				}else{
-					landingDirApp=confObj.getAppNameNode()+"/user/"+confObj.getInstanceName()+"/"+interimDir+"/"+confObj.getSourceName()+"/"+confObj.getTableOwner()+"/HDI_"+confObj.getTableName();
+				if ("".equals(interimDir)) {
+					landingDirApp = confObj.getAppNameNode() + "/user/"
+							+ confObj.getInstanceName() + "/"
+							+ confObj.getSourceName() + "/"
+							+ confObj.getTableOwner() + "/HDI_"
+							+ confObj.getTableName();
+				} else {
+					landingDirApp = confObj.getAppNameNode() + "/user/"
+							+ confObj.getInstanceName() + "/" + interimDir
+							+ "/" + confObj.getSourceName() + "/"
+							+ confObj.getTableOwner() + "/HDI_"
+							+ confObj.getTableName();
 				}
-            	confObj.setLandingDirectory(landingDirApp);
-	            
-				//properties only for import
-				if(confObj.getImport_export_flag().equalsIgnoreCase("1")){
-					
-					try{
-					confObj.setSplitByColumn(properties.getProperty("split_by_column").toUpperCase());
-					}catch(NullPointerException e){
-						/*logger.error("please provide split_by_column");
-						throw new Error(e);*/
-						confObj.setSplitByColumn("");
-					}
-					
-					try{
-					confObj.setLastModifiedDateColumn(properties.getProperty("last_modified_date_column").toUpperCase());
-					}catch(NullPointerException e){
-						logger.error("please provide last_modified_date_column");
+				confObj.setLandingDirectory(landingDirApp);
+
+				try {
+					confObj.setSplitByColumn(properties.getProperty(
+							"split_by_column").toUpperCase());
+				} catch (NullPointerException e) {
+					/*
+					 * logger.error("please provide split_by_column"); throw new
+					 * Error(e);
+					 */
+					confObj.setSplitByColumn("");
+				}
+
+				try {
+					confObj.setLastModifiedDateColumn(properties.getProperty(
+							"last_modified_date_column").toUpperCase());
+				} catch (NullPointerException e) {
+					logger.error("please provide last_modified_date_column");
+					throw new Error(e);
+				}
+				if ("".equals(confObj.getLastModifiedDateColumn())) {
+					logger.warn("As last_modified_date_column is empty. The full table will be imported each time.");
+					// throw new Error();
+				}
+
+				String userSelectedCols = null;
+				try {
+					userSelectedCols = properties.getProperty(
+							"user_selected_columns").toUpperCase();
+				} catch (NullPointerException e) {
+					// logger.info("please provide user_selected_columns");
+					userSelectedCols = "";
+				}
+
+				String[] userColumns = userSelectedCols.split(",");
+				columnDetails = new LinkedList<String>();
+				for (String col : userColumns) {
+					columnDetails.add(col);
+				}
+				confObj.setColumnDetails(columnDetails);
+
+				try {
+					confObj.setRetentionRawData(Integer.parseInt(properties
+							.getProperty("retention_period_raw_data")));
+				} catch (NullPointerException e) {
+					/*
+					 * logger.error("please provide split_by_column"); throw new
+					 * Error(e);
+					 */
+					// logger.info("by default");
+					confObj.setRetentionRawData(-1);
+				} catch (IllegalArgumentException e) {
+					if (!(properties.getProperty("retention_period_raw_data"))
+							.equalsIgnoreCase("")) {
+						logger.error("Please provide retention_period_raw_data in integer");
+						logger.error("", e);
 						throw new Error(e);
-					}
-					if("".equals(confObj.getLastModifiedDateColumn())){
-						logger.warn("As last_modified_date_column is empty. The full table will be imported each time.");
-						//throw new Error();
-					}
-					
-					String userSelectedCols = null;
-					try{
-					userSelectedCols = properties.getProperty("user_selected_columns").toUpperCase();
-					}catch(NullPointerException e){
-						//logger.info("please provide user_selected_columns");
-						userSelectedCols = "";
-					}
-					
-					String[] userColumns = userSelectedCols.split(",");
-					columnDetails = new LinkedList<String>();
-					for(String col : userColumns){
-						columnDetails.add(col);
-					}
-					confObj.setColumnDetails(columnDetails);
-				
-					
-					
-					try{
-		    			confObj.setRetentionRawData(Integer.parseInt(properties.getProperty("retention_period_raw_data")));
-		    		}catch(NullPointerException e){
-						/*logger.error("please provide split_by_column");
-						throw new Error(e);*/
-						//logger.info("by default");
-						confObj.setRetentionRawData(-1);
-		    		}
-		            catch(IllegalArgumentException e){
-		            	if(!(properties.getProperty("retention_period_raw_data")).equalsIgnoreCase("")){
-			            	logger.error("Please provide retention_period_raw_data in integer");
-			            	logger.error("",e);
-			            	throw new Error(e);
-		            	}else{
-		            		confObj.setRetentionRawData(-1);
-		            	}
-		            }
-					
-					if("".equals(confObj.getRetentionRawData())){
+					} else {
 						confObj.setRetentionRawData(-1);
 					}
-					
-					
 				}
-				if(confObj.getImport_export_flag().equalsIgnoreCase("2")){
-					
-					 String stagingFlag = properties.getProperty("push_to_staging_table");
-			            if(stagingFlag == null || "".equals(stagingFlag)){
-			                logger.info("By default setting push_to_staging_table to false");
-			                confObj.setStagingRequired(false);
-			            }
-			            else{
-			            	if("true".equalsIgnoreCase(stagingFlag)){
-			            		confObj.setStagingRequired(true);
-			            		try{
-			            			confObj.setStagingTable(properties.getProperty("staging_table").toUpperCase());
-			            			}
-			            			catch(NullPointerException e){
-			            				logger.error("please provide staging_table");
-			            				throw new Error(e);
-			            			}
-			            	}
-			            	else if("false".equalsIgnoreCase(stagingFlag))
-			            		confObj.setStagingRequired(false);
-			            }
-			            
-			            try{
-	            			confObj.setExportDir(properties.getProperty("export_dir").toUpperCase());
-	            		}
-	            		catch(NullPointerException e){
-	           				logger.error("please provide export directory");
-	           				throw new Error(e);
-	            		} 
-			            if("".equals(confObj.getExportDir())){
-			            	logger.error("please provide export directory");
-	           				throw new Error();
-			            }
-			            String updateFlag = properties.getProperty("update_database");
-			            if(updateFlag == null || "".equals(updateFlag)){
-			                logger.info("By default setting update_database to false");
-			                confObj.setUpdateDatabase(false);
-			            }
-			            else{
-			            	if("true".equalsIgnoreCase(updateFlag)){
-			            		confObj.setUpdateDatabase(true);
-			            		try{
-			            			confObj.setUpdateKeyColumn(properties.getProperty("update_key_column").toUpperCase());
-			            			}
-			            			catch(NullPointerException e){
-			            				logger.error("please provide update_key_column");
-			            				throw new Error(e);
-			            			}
-			            		try{
-			            			confObj.setUpdateMode(properties.getProperty("update_mode").toUpperCase());
-			            			}
-			            			catch(NullPointerException e){
-			            				logger.error("please provide update_mode");
-			            				throw new Error(e);
-			            			}
-			            	}
-			            	else if("false".equalsIgnoreCase(updateFlag))
-			            		confObj.setUpdateDatabase(false);
-			            }
-			            
-			            confObj.setFieldSeparator(properties.getProperty("fields_terminated_by"));
-						if(confObj.getFieldSeparator() == null || "".equalsIgnoreCase(confObj.getFieldSeparator())){
-							logger.info("By default fields_terminated_by is set to be , (comma)");
-							confObj.setFieldSeparator(",");
-						}
-						
-						confObj.setLineSeparator(properties.getProperty("lines_terminated_by"));
-						if(confObj.getLineSeparator() == null || "".equalsIgnoreCase(confObj.getLineSeparator())){
-							logger.info("By default lines_terminated_by is set to be cluster");
-							confObj.setLineSeparator("\n");
-						}
-						
-					//confObj.setClear_staging_table(properties.getProperty("clear_staging-table"));
-					//confObj.setBatch_mode(properties.getProperty("batch_mode"));
-					//confObj.setStored_procedure_name(properties.getProperty("stored_procedure_name"));
-					//confObj.setDirect_flag(properties.getProperty("direct_flag"));//
-					//confObj.setColumns_name(properties.getProperty("columns_name"));
+
+				if ("".equals(confObj.getRetentionRawData())) {
+					confObj.setRetentionRawData(-1);
 				}
-            }
-            else{
-            	String baseDir = properties.getProperty("file_base_directory");
-				if(baseDir == null || "".equals(baseDir)){
-					logger.error("please provide file_base_directory");
+
+				confObj.setHiveTable(properties.getProperty("hive_table_name"));
+				if (confObj.getHiveTable() == null
+						|| "".equals(confObj.getHiveTable())) {
+					logger.error("please provide hive_table_name");
 					throw new Error();
 				}
-				else{
-					if(!baseDir.endsWith("/")){
-						baseDir = baseDir+"/";
+			}
+			if (ieFlag.equalsIgnoreCase(SQOOP_EXPORT)) {
+
+				String stagingFlag = properties
+						.getProperty("push_to_staging_table");
+				if (stagingFlag == null || "".equals(stagingFlag)) {
+					logger.info("By default setting push_to_staging_table to false");
+					confObj.setStagingRequired(false);
+				} else {
+					if ("true".equalsIgnoreCase(stagingFlag)) {
+						confObj.setStagingRequired(true);
+						try {
+							confObj.setStagingTable(properties.getProperty(
+									"staging_table").toUpperCase());
+						} catch (NullPointerException e) {
+							logger.error("please provide staging_table");
+							throw new Error(e);
+						}
+					} else if ("false".equalsIgnoreCase(stagingFlag))
+						confObj.setStagingRequired(false);
+				}
+
+				try {
+					confObj.setExportDir(properties.getProperty("export_dir"));
+							//.toUpperCase());
+				} catch (NullPointerException e) {
+					logger.error("please provide export directory");
+					throw new Error(e);
+				}
+				if ("".equals(confObj.getExportDir())) {
+					// logger.info("Export directory is blank! checking export hive database and table name");
+					confObj.setHive_database_name(properties
+							.getProperty("hive_database_name"));
+					if ("".equalsIgnoreCase(confObj.getHive_database_name())) {
+						logger.error("Hive Database cannot be blank ! Its a mandatory field");
+						throw new Error("Database field is blank");
+
+					} else {
+						confObj.setExport_hive_table(properties
+								.getProperty("export_hive_table"));
+						if ("".equalsIgnoreCase(confObj.getExport_hive_table())) {
+							logger.error("export hive table name cannot be blank in case export directory is blank");
+							throw new Error("Export hive table left blank");
+						} else {
+							confObj.setTable_part_colname(properties
+									.getProperty("table_part_name"));
+							if ("".equalsIgnoreCase(confObj
+									.getTable_part_colname())) {
+								logger.warn("No partition column provided !! Assume there is no partition column hence full table Export will take place");
+							}
+						}
+
 					}
-					confObj.setFileDirectory(baseDir);
 				}
-				
-				confObj.setFileDateFormat(properties.getProperty("file_date_format"));
-				if(confObj.getFileDateFormat()== null || "".equals(confObj.getFileDateFormat())){
-					logger.warn("file_date_format is not set. So by default file_date_format is set to yyyy-MM-dd HH:mm:ss");
-					confObj.setFileDateFormat("yyyy-MM-dd HH:mm:ss");
-				}
-				
-				String delimiter = (properties.getProperty("file_delimiter"));
-				if(delimiter == null || "".equals(delimiter)){
-					logger.error("please provide file_delimiter");
-					throw new Error();
-				}
-				String x ="";
-				for(char c : delimiter.toCharArray()){
-					x = x+"\\\\"+c;
-				}
-				
-				confObj.setFileDelimeter(x);
-				Utility.delimiter = x;
-				confObj.setHiveTable(properties.getProperty("file_hive_table_name"));
-				if(confObj.getHiveTable() == null || "".equals(confObj.getHiveTable())){
-					logger.error("please provide file_hive_table_name");
-					throw new Error();
-				}
-				
-				/*String threshold = properties.getProperty("record_threshold");
-				if(threshold == null){
-					logger.info("record_threshold not provided so by default threshold is set to 100%");
-					threshold = "0";
-				}
-				try{
-					confObj.setThreshold(Double.parseDouble(threshold));
-				}
-				catch(NumberFormatException e){
-					logger.error("Please provide record_threshold in decimal values only.");
-				}*/
-				
-				confObj.setFileMask(properties.getProperty("file_mask"));
-				confObj.setControlFileName(properties.getProperty("control_file_name"));
-				confObj.setMappingSheetname(properties.getProperty("mapping_sheet_name"));
-				if(confObj.getFileMask() == null || "".equals(confObj.getFileMask())){
-					logger.warn("file_mask is not provided. This means all the files in the base directory will be processed at once.");
-					logger.warn("Select an option \n y - Continue \t n - Hault Execution");
-					BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-					try {
-						String choice = reader.readLine();
-						while((("y".equalsIgnoreCase(choice)) || ("n".equalsIgnoreCase(choice))) == false){
-							choice = "";
-							logger.warn("Select an option \n y - Continue \t n - Hault Execution");
-							choice = reader.readLine();
-							
+				String updateFlag = properties.getProperty("update_database");
+				if (updateFlag == null || "".equals(updateFlag)) {
+					logger.info("By default setting update_database to false");
+					confObj.setUpdateDatabase(false);
+				} else {
+					if ("true".equalsIgnoreCase(updateFlag)) {
+						confObj.setUpdateDatabase(true);
+						try {
+							confObj.setUpdateKeyColumn(properties.getProperty(
+									"update_key_column").toUpperCase());
+						} catch (NullPointerException e) {
+							logger.error("please provide update_key_column");
+							throw new Error(e);
 						}
-						if("n".equalsIgnoreCase(choice)){
-							throw new Error();
+						try {
+							confObj.setUpdateMode(properties.getProperty(
+									"update_mode").toUpperCase());
+						} catch (NullPointerException e) {
+							logger.error("please provide update_mode");
+							throw new Error(e);
 						}
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						logger.error(e);
+					} else if ("false".equalsIgnoreCase(updateFlag))
+						confObj.setUpdateDatabase(false);
+				}
+				confObj.setDate_timestamp_column(properties
+						.getProperty("date_timestamp_column"));
+				if ("".equalsIgnoreCase(confObj.getDate_timestamp_column())) {
+					logger.info("It is aasume that there is no date/timestamp column in table");
+				}
+				confObj.setFieldSeparator(properties
+						.getProperty("fields_terminated_by"));
+				if (confObj.getFieldSeparator() == null
+						|| "".equalsIgnoreCase(confObj.getFieldSeparator())) {
+					logger.info("By default fields_terminated_by is set to be , (comma)");
+					confObj.setFieldSeparator(",");
+				}
+
+				confObj.setLineSeparator(properties
+						.getProperty("lines_terminated_by"));
+				if (confObj.getLineSeparator() == null
+						|| "".equalsIgnoreCase(confObj.getLineSeparator())) {
+					logger.info("By default lines_terminated_by is set to be \\n ");
+					confObj.setLineSeparator("\n");
+				}
+
+				confObj.setInput_null_string(properties
+						.getProperty("input_null_string_column"));
+				if (confObj.getInput_null_string() == null
+						|| "".equalsIgnoreCase(confObj.getInput_null_string())) {
+					logger.info("By default null value for string column  is treated as  \\N ");
+					confObj.setInput_null_string("\\" + "\\N");
+				} else
+					confObj.setInput_null_string("\\\\"
+							+ confObj.getInput_null_string());
+
+				confObj.setInput_null_non_string(properties
+						.getProperty("input_null_non_string_column"));
+				if (confObj.getInput_null_non_string() == null
+						|| "".equalsIgnoreCase(confObj
+								.getInput_null_non_string())) {
+					logger.info("By default null value for non string column  is treated as  \\N ");
+					confObj.setInput_null_non_string("\\" + "\\N");
+				} else
+					confObj.setInput_null_non_string("\\\\"
+							+ confObj.getInput_null_non_string());
+				// confObj.setClear_staging_table(properties.getProperty("clear_staging-table"));
+				// confObj.setBatch_mode(properties.getProperty("batch_mode"));
+				// confObj.setStored_procedure_name(properties.getProperty("stored_procedure_name"));
+				// confObj.setDirect_flag(properties.getProperty("direct_flag"));//
+				// confObj.setColumns_name(properties.getProperty("columns_name"));
+			}
+		} else {
+			String baseDir = properties.getProperty("file_base_directory");
+			if (baseDir == null || "".equals(baseDir)) {
+				logger.error("please provide file_base_directory");
+				throw new Error();
+			} else {
+				if (!baseDir.endsWith("/")) {
+					baseDir = baseDir + "/";
+				}
+				confObj.setFileDirectory(baseDir);
+			}
+
+			confObj.setFileDateFormat(properties
+					.getProperty("file_date_format"));
+			if (confObj.getFileDateFormat() == null
+					|| "".equals(confObj.getFileDateFormat())) {
+				logger.warn("file_date_format is not set. So by default file_date_format is set to yyyy-MM-dd HH:mm:ss");
+				confObj.setFileDateFormat("yyyy-MM-dd HH:mm:ss");
+			}
+
+			String delimiter = (properties.getProperty("file_delimiter"));
+			if (delimiter == null || "".equals(delimiter)) {
+				logger.error("please provide file_delimiter");
+				throw new Error();
+			}
+			String x = "";
+			for (char c : delimiter.toCharArray()) {
+				x = x + "\\\\" + c;
+			}
+
+			confObj.setFileDelimeter(x);
+			Utility.delimiter = x;
+			confObj.setHiveTable(properties.getProperty("file_hive_table_name"));
+			if (confObj.getHiveTable() == null
+					|| "".equals(confObj.getHiveTable())) {
+				logger.error("please provide file_hive_table_name");
+				throw new Error();
+			}
+
+			/*
+			 * String threshold = properties.getProperty("record_threshold");
+			 * if(threshold == null){ logger.info(
+			 * "record_threshold not provided so by default threshold is set to 100%"
+			 * ); threshold = "0"; } try{
+			 * confObj.setThreshold(Double.parseDouble(threshold)); }
+			 * catch(NumberFormatException e){ logger.error(
+			 * "Please provide record_threshold in decimal values only."); }
+			 */
+
+			confObj.setFileMask(properties.getProperty("file_mask"));
+			confObj.setControlFileName(properties
+					.getProperty("control_file_name"));
+			confObj.setMappingSheetname(properties
+					.getProperty("mapping_sheet_name"));
+			if (confObj.getFileMask() == null
+					|| "".equals(confObj.getFileMask())) {
+				logger.warn("file_mask is not provided. This means all the files in the base directory will be processed at once.");
+				logger.warn("Select an option \n y - Continue \t n - Hault Execution");
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(System.in));
+				try {
+					String choice = reader.readLine();
+					while ((("y".equalsIgnoreCase(choice)) || ("n"
+							.equalsIgnoreCase(choice))) == false) {
+						choice = "";
+						logger.warn("Select an option \n y - Continue \t n - Hault Execution");
+						choice = reader.readLine();
+
+					}
+					if ("n".equalsIgnoreCase(choice)) {
 						throw new Error();
 					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					logger.error(e);
+					throw new Error();
 				}
-				try{
-					confObj.setLineNumberData(Integer.parseInt(properties.getProperty("line_number")));
-					}catch(NullPointerException e){
-						logger.error("please provide line_number");
-						throw new Error(e);
-					}
-					catch(IllegalArgumentException e){
-						logger.error("Please provide number for line_number in integers.");
-						logger.error("",e);
-						throw new Error(e);
-					}
-					if("".equals(confObj.getNumOfMapper())){
-						logger.warn("line_number is taken as 0 by default.");
-						confObj.setLineNumberData(0);
-					}
-					
-				    String ftPresent = properties.getProperty("file_trailer_present");
-					if(ftPresent == null || "".equals(ftPresent)){
-						logger.error("please provide file_trailer_present");
-						throw new Error();
-					}
-					else{
-						if("true".equalsIgnoreCase(ftPresent)){
-							confObj.setFileTrailerPresent(true);
-						}
-						else if("false".equalsIgnoreCase(ftPresent)){
-							confObj.setFileTrailerPresent(false);
-						}
-						else{
-							logger.error("provide file_trailer_present as only true/false");
-							throw new Error();
-						}
-					}
-					if(confObj.isFileTrailerPresent()){
-						confObj.setFileTrailerKeyword(properties.getProperty("file_trailer_keyword"));
-						if(confObj.getFileTrailerKeyword() == null || "".equals(confObj.getFileTrailerKeyword())){
-							logger.error("please provide file_trailer_keyword");
-							throw new Error();
-						}
-					}
-					else{
-						confObj.setFileTrailerKeyword("FILETRAILER_NOT_APPLICABLE");
-					}
-					confObj.setFileHeaderKeyword(properties.getProperty("file_header"));
-					if(confObj.getFileHeaderKeyword() == null || "".equals(confObj.getFileHeaderKeyword())){
-						confObj.setFileHeaderKeyword("FILEHEADER_NOT_APPLICABLE");
-					}
-            }
+			}
+			try {
+				confObj.setLineNumberData(Integer.parseInt(properties
+						.getProperty("line_number")));
+			} catch (NullPointerException e) {
+				logger.error("please provide line_number");
+				throw new Error(e);
+			} catch (IllegalArgumentException e) {
+				logger.error("Please provide number for line_number in integers.");
+				logger.error("", e);
+				throw new Error(e);
+			}
+			if ("".equals(confObj.getNumOfMapper())) {
+				logger.warn("line_number is taken as 0 by default.");
+				confObj.setLineNumberData(0);
+			}
+
+			String ftPresent = properties.getProperty("file_trailer_present");
+			if (ftPresent == null || "".equals(ftPresent)) {
+				logger.error("please provide file_trailer_present");
+				throw new Error();
+			} else {
+				if ("true".equalsIgnoreCase(ftPresent)) {
+					confObj.setFileTrailerPresent(true);
+				} else if ("false".equalsIgnoreCase(ftPresent)) {
+					confObj.setFileTrailerPresent(false);
+				} else {
+					logger.error("provide file_trailer_present as only true/false");
+					throw new Error();
+				}
+			}
+			if (confObj.isFileTrailerPresent()) {
+				confObj.setFileTrailerKeyword(properties
+						.getProperty("file_trailer_keyword"));
+				if (confObj.getFileTrailerKeyword() == null
+						|| "".equals(confObj.getFileTrailerKeyword())) {
+					logger.error("please provide file_trailer_keyword");
+					throw new Error();
+				}
+			} else {
+				confObj.setFileTrailerKeyword("FILETRAILER_NOT_APPLICABLE");
+			}
+			confObj.setFileHeaderKeyword(properties
+					.getProperty("file_header_keyword"));
+			if (confObj.getFileHeaderKeyword() == null
+					|| "".equals(confObj.getFileHeaderKeyword())) {
+				confObj.setFileHeaderKeyword("FILEHEADER_NOT_APPLICABLE");
+			}
 			
+			String pollFreq = properties.getProperty("polling_frequency");
+			//System.out.println(pollFreq);
+			if(! "".equalsIgnoreCase(pollFreq)) {				
+				confObj.setPollingFrequency(pollFreq);
+			}			
+		}
+		
+		//setting SLA parameters in job.properties
+		
+		String slaFlag = properties.getProperty("sla_required");
+		//System.out.println(slaFlag);
+		if("true".equalsIgnoreCase(slaFlag)) {
+			//isSlaRequired = true;
+			confObj.setSlaRequired(true);			
+			String slaStart = properties.getProperty("sla_start_time");
+			String slaEnd = properties.getProperty("sla_end_time");
+			String slaContact = properties.getProperty("sla_alert_contact");
+			
+			if(("".equalsIgnoreCase(slaStart)) || ("".equalsIgnoreCase(slaEnd)) || ("".equalsIgnoreCase(slaContact))) {
+				logger.error("All SLA information should be filled if SLA Required is true", new IllegalArgumentException());
+				throw new Error();
+			}
+			
+			confObj.setSlaStart(slaStart);
+			confObj.setSlaEnd(slaEnd);
+			confObj.setSlaContact(slaContact);
+			
+			//System.out.println(confObj.isSlaRequired());
+		}
+
 		return confObj;
 	}
 }

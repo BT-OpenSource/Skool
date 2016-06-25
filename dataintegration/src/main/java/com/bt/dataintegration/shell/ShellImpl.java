@@ -12,32 +12,47 @@ public class ShellImpl implements IShell {
 		String sourceDir = "NA";
 		String sourceDirError = "NA";
 
+		
+		DirectoryHandler.createNewFile(conf, ERROR_LOG_SCRIPT,
+				errorShellFile(sourceDirError));
+		DirectoryHandler.createNewFile(conf, AUDIT_LOG_SCRIPT,
+				auditLogShell(sourceDir));
+		DirectoryHandler.sendFileToHDFS(conf, ERROR_LOG_SCRIPT);
+		DirectoryHandler.sendFileToHDFS(conf, AUDIT_LOG_SCRIPT);
+		DirectoryHandler.givePermissionToHDFSFile(conf, AUDIT_LOG_SCRIPT);
+		DirectoryHandler.givePermissionToHDFSFile(conf, ERROR_LOG_SCRIPT);
+		
+		if(SQOOP_EXPORT.equalsIgnoreCase(conf.getImport_export_flag())){
+			DirectoryHandler.createNewFile(conf, CAPTURE_START_DATE_TIME_SCRIPT,captureStartDateTimeShell());
+			DirectoryHandler.sendFileToHDFS(conf, CAPTURE_START_DATE_TIME_SCRIPT);	
+			DirectoryHandler.givePermissionToHDFSFile(conf,CAPTURE_START_DATE_TIME_SCRIPT);	
+		}
+		
+		
+		if(SQOOP_IMPORT.equalsIgnoreCase(conf.getImport_export_flag())){
 		DirectoryHandler.createNewFile(conf, REFRESH_LAST_COL_VALUE_SCRIPT,
 				refreshLastColValueShell());
 		DirectoryHandler.createNewFile(conf, UPDATE_LAST_COL_VALUE_SCRIPT,
 				updateLastColValueShell(conf));
-		DirectoryHandler.createNewFile(conf, AUDIT_LOG_SCRIPT,
-				auditLogShell(sourceDir));
+		
 		DirectoryHandler.createNewFile(conf, HOUSE_KEEPING_SCRIPT,
 				housekeepShell());
-		DirectoryHandler.createNewFile(conf, ERROR_LOG_SCRIPT,
-				errorShellFile(sourceDirError));
+		
 
 		DirectoryHandler.sendFileToHDFS(conf, REFRESH_LAST_COL_VALUE_SCRIPT);
 		DirectoryHandler.sendFileToHDFS(conf, UPDATE_LAST_COL_VALUE_SCRIPT);
-		DirectoryHandler.sendFileToHDFS(conf, AUDIT_LOG_SCRIPT);
 		DirectoryHandler.sendFileToHDFS(conf, HOUSE_KEEPING_SCRIPT);
 		DirectoryHandler.sendFileToHDFS(conf, UNIX_DATE_FILE);
-		DirectoryHandler.sendFileToHDFS(conf, ERROR_LOG_SCRIPT);
+		
 
 		DirectoryHandler.givePermissionToHDFSFile(conf,
 				REFRESH_LAST_COL_VALUE_SCRIPT);
 		DirectoryHandler.givePermissionToHDFSFile(conf,
 				UPDATE_LAST_COL_VALUE_SCRIPT);
-		DirectoryHandler.givePermissionToHDFSFile(conf, AUDIT_LOG_SCRIPT);
+		
 		DirectoryHandler.givePermissionToHDFSFile(conf, HOUSE_KEEPING_SCRIPT);
 		DirectoryHandler.givePermissionToHDFSFile(conf, UNIX_DATE_FILE);
-		DirectoryHandler.givePermissionToHDFSFile(conf, ERROR_LOG_SCRIPT);
+		}	
 	}
 
 	public void shellToHDFSFile(HadoopConfig conf) {
@@ -70,7 +85,7 @@ public class ShellImpl implements IShell {
 				+ "archive_dir=${target_dir}/archive\n"
 				+ "temp_dir=${target_dir}/temp\n"
 				+ "rejected_dir=${target_dir}/rejected_files/${start_date}\n"
-				+ "hadoop fs -rm -r ${temp_dir}\n"
+				
 				+ "hadoop fs -mkdir -p ${temp_dir}\n"
 				+ "hadoop fs -mkdir -p ${rejected_dir}\n"
 				+ "echo start_date=${start_date}\n"
@@ -97,12 +112,14 @@ public class ShellImpl implements IShell {
 				+ "lowerBound=${Array[5]}\n"
 				+ "echo lowerBound=${lowerBound}\n"
 				+ "start_date=`date +%Y-%m-%d:%H:%M:%S`\n"
-				+ "d=`date +%d-%h-%Y`\n" + "h=`date +%H:%M:%S`\n"
-				+ "dateNow=\"$d $h\"\n" + "targetDirYear=`date +'%Y'`\n"
-				+ "targetDirMonth=`date +'%m'`\n"
-				+ "targetDirDate=`date +'%d'`\n"
-				+ "targetDirHour=`date +'%H'`\n"
-				+ "targetDirMinute=`date +'%M'`\n"
+				+ "d=`date +%d-%m-%Y`\n" 
+				+ "h=`date +%H:%M:%S`\n"
+				+ "dateNow=\"$d $h\"\n" 
+				+ "targetDirDate=`echo $dateNow | cut -c 1-2` \n"
+				+ "targetDirMonth=`echo $dateNow | cut -c 4-5` \n"
+				+ "targetDirYear=`echo $dateNow | cut -c 7-10` \n"
+				+ "targetDirHour=`echo $dateNow | cut -c 12-13` \n"
+				+ "targetDirMinute=`echo $dateNow | cut -c 15-16` \n"
 				+ "echo upperBound=${dateNow}\n"
 				+ "echo targetDirYear=${targetDirYear}\n"
 				+ "echo targetDirMonth=${targetDirMonth}\n"
@@ -170,6 +187,7 @@ public class ShellImpl implements IShell {
 				+ "ieflag=\"SQOOP_EXPORT\"\n"
 				+ "elif [ ${import_export_flag} -eq 3 ]\n"
 				+ "then\n"
+				+ "hadoop fs -rm -r ${13}\n"
 				+ "hadoop fs -mv ${11}/* ${12}\n"
 				+ "hadoop fs -rm -r ${11}/*\n"
 				+ "ieflag=\"FILE_IMPORT\"\n"
@@ -179,7 +197,7 @@ public class ShellImpl implements IShell {
 
 				+ "echo \"NOR = ${recordcount}, WFN = ${workflow_name}\"\n"
 				+ "echo \"Saving details to file :-\"\n"
-				+ "echo ${workflow_id},${workflow_name},${runno},${jobstart},${jobend},${oracle_table_name},${ieflag},${hadoop_raw_dir_name},${recordcount},\"SUCCEEDED\",,,${sourceDirectory},${milestone} | hadoop fs -appendToFile - $2";
+				+ "echo ${workflow_id},${workflow_name},${runno},${jobstart},${jobend},${ieflag},${hadoop_raw_dir_name},${recordcount},\"SUCCEEDED\",${sourceDirectory},${milestone},NA,NA | hadoop fs -appendToFile - $2";
 		return shellCmd;
 	}
 
@@ -253,14 +271,31 @@ public class ShellImpl implements IShell {
 				+ "elif [ ${import_export_flag} -eq 3 ]\n"
 				+ "then\n"
 				+ "ieflag=\"FILE_IMPORT\"\n"
+				+ "hadoop fs -rm -r ${13}\n"			
 				+ "else\n"
 				+ "echo \"Incorrect import_export_flag argument encountered.\n Please check job.properties file.\"\n"
 				+ "fi\n"
 
 				+ "echo \"NOR = ${recordcount}, WFN = ${workflow_name}\"\n"
 				+ "echo \"Saving details to file :-\"\n"
-				+ "echo ${workflow_id},${workflow_name},${runno},${jobstart},${jobend},${oracle_table_name},${ieflag},${hadoop_raw_dir_name},${recordcount},\"FAILED\",${error_code},${error_msg},${sourceDirectory},${milestone} | hadoop fs -appendToFile - $2";
+				+ "echo ${workflow_id},${workflow_name},${runno},${jobstart},${jobend},${ieflag},${hadoop_raw_dir_name},${recordcount},\"FAILED\",${sourceDirectory},${milestone},${error_code},${error_msg} | hadoop fs -appendToFile - $2";
 		return shellCmd;
+	}
+	
+	public String captureStartDateTimeShell(){
+		String shellCmd = "nameNode=$1 \n" 
+				+ "queName=$2\n"
+				+ "wfId=$3\n"
+				+ "userDirectory=$4\n"
+				+ "start_date_time=`date +%Y-%m-%d:%H:%M:%S`\n"
+				+ "echo start_date_time=${start_date_time}\n"
+				+ "if [[ -z $userDirectory ]]\n"
+				+ "then\n"
+				+ "hadoop dfs -mkdir ${nameNode}/user/${queName}/${wfId}\n"
+				+ "hadoop dfs -chmod 777  ${nameNode}/user/${queName}/${wfId}\n"
+				+ "fi\n";
+		return shellCmd;
+		
 	}
 
 }

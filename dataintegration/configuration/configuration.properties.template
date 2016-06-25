@@ -42,19 +42,53 @@ user_selected_columns=
 split_by_column=
 #Needed by sqoop for incremental import should be a date column which capture the last updated date If left blank full table will be imported each every time
 last_modified_date_column=
-
+#Name of the hive table
+hive_table_name=<Name of the hive table in hdfs>
 
 ### EXPORT PARAMETERS ###
+##In case if user want to push data into staging table and then load into main table in one go
+push_to_staging_table=false
+
+#Staging table cannot be used in case update mode is set 
+staging_table =EMP
+
+##In case there is constraint in table then User need to specify wether user wants to Update in case record is already there!Note:-In case above parameters is set then below parameter will be invalid 
+update_database=false
+
+##Specify fields terminated delimiter  ',' or | etc !!By default it will be \001
+fields_terminated_by=\\001
+
+##specify line termination delimiter!! By default It will be \n
+lines_terminated_by=
+
+##specify the character which will be treated as null in case it appears in a file for string column
+input_null_string_column=\N
+
+##specify the character which will be treated as null in case it appears in a file for non string column
+input_null_non_string_column=\N
 
 #HDFS source path for the export.   
 export_dir=
-#Anchor column to use for updates. Use a comma separated list of columns if there are more than one column.   
+
+#In case export dir not given or left blank then user can provide below properties
+#database name where table is present.
+hive_database_name=HAASCT544_01
+
+#Hive table name which you want to export! this is mandatory field in case export directory not given.
+export_hive_table=EMP_TEST
+
+# Table partition column name with values! for eg part_year:2016,part_month:04
+table_part_name=
+
+#If date/timestamp column present in hive table, provide the same  with comma separated 
+date_timestamp_column=
+
+#Anchor column to use for updates. Use a comma separated list of columns if there are more than one column.Note:In case staging table is set true then this property will be invalid   
 update_key_column=
-#Specify how updates are performed when new rows are found with non-matching keys in database.Legal values for mode include updateonly (default) and allowinsert.   
+
+#Specify how updates are performed when new rows are found with non-matching keys in database.Legal values for mode include updateonly (default) and allowinsert. 
+#Staging table cannot be used in case update mode is set .Note:In case staging table is set true then this property will be invalid   
 update_mode=
-columns_name= 
-#The table in which data will be staged before being inserted into the destination table.
-staging_table=
 
 ########################### FILE SYSTEM DETAILS REQUIRED IF  import export file flag is 3 or 4 #########
 #The base directory where the input files exists
@@ -109,7 +143,13 @@ throttle=1
 timeout=0
 # frequency to be provided in minutes(1440 mins= 1 day)
 frequency=1440
-
+polling_frequency=10
+cron_frequency=5 4 3 * *
+# Coordinator SLA parameters
+sla_required=false
+sla_start_time=5
+sla_end_time=55
+sla_alert_contact=someone@domain.com
 
 ########################################## HOUSEKEEPING DETAILS ##########################################
 # User should specify the retention period for raw_data in number of days.
@@ -120,3 +160,10 @@ retention_period_raw_data=
 #Email address to which Oozie Success/Failure alerts will go to
 success_email_id=someone@bt.com
 failure_email_id=someone@bt.com
+
+##########################################COMPRESSION DETAILS###########################
+compression_required=true
+#Snappy - 1
+#Bzip2  - 2
+#Gzip   - 3
+compression_codec=1

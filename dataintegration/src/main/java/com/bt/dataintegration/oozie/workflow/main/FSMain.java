@@ -1,38 +1,32 @@
 package com.bt.dataintegration.oozie.workflow.main;
 
-import com.bt.dataintegration.oozie.workflow.tags.ActionFSCreate;
-import com.bt.dataintegration.oozie.workflow.tags.CreatePath;
+import com.bt.dataintegration.oozie.workflow.tags.ActionFS;
 import com.bt.dataintegration.oozie.workflow.tags.ErrorTo;
-import com.bt.dataintegration.oozie.workflow.tags.FSCreate;
+import com.bt.dataintegration.oozie.workflow.tags.FSTag;
+import com.bt.dataintegration.oozie.workflow.tags.FSdelete;
 import com.bt.dataintegration.oozie.workflow.tags.OkTo;
-import com.bt.dataintegration.property.config.HadoopConfig;
 
-/**
- * @author 609349708
- *	(Abhinav Meghmala)
- */
+import static com.bt.dataintegration.constants.Constants.*;
+
 public class FSMain {
 
-	private ActionFSCreate afsc = new ActionFSCreate();
-	private FSCreate fsc = new FSCreate();
-	private CreatePath cpath = new CreatePath();
-	private OkTo okt = new OkTo();
-	private ErrorTo ert = new ErrorTo();
-	
-	public ActionFSCreate setFSMain(HadoopConfig hconf) {
+	public ActionFS setFSMain() {
 		
-		String fsCreatePath = "${nameNode}/user/cloudera/${queueName}/${tableName}/landing";
-		cpath.setPath(fsCreatePath);
-		fsc.setCpath(cpath);
+		FSTag tag = new FSTag();
+		FSdelete del = new FSdelete();
+		OkTo okt = new OkTo();
+		ErrorTo ert = new ErrorTo();
+		ActionFS act = new ActionFS();
 		
-		okt.setOkt("SQOOP_IMPORT_FOR_" + hconf.getTableName());
-		ert.setErt("EMAIL_FAILURE");
+		del.setPath(TEMP_FS);
+		tag.setDelete(del);
+		act.setName(ACTION_FS_DELETE);
+		okt.setOkt(ACTION_CAPTURE_AUDIT_LOGS);
+		ert.setErt(ACTION_CAPTURE_ERROR_LOGS);
+		act.setOkt(okt);
+		act.setErt(ert);
+		act.setFsc(tag);
 		
-		afsc.setErt(ert);
-		afsc.setOkt(okt);
-		afsc.setName("CREATE_LANDING_DIR_FOR_" + hconf.getTableName());
-		afsc.setFsc(fsc);
-		
-		return afsc;
+		return act;
 	}
 }

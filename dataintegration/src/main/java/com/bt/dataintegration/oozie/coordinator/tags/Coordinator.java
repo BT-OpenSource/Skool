@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(propOrder={"name","frequency","start","end","timezone","xmlns","controls","action"})
+@XmlType(propOrder={"name","frequency","start","end","timezone","xmlns","xmlnssla","controls", "ds", "ie", "action"})
 @XmlRootElement(name="coordinator-app")
 public class Coordinator {
 
@@ -16,7 +16,13 @@ public class Coordinator {
 	private String timezone;
 	private String xmlns;
 	private Controls controls;
+	private Datasets ds;
+	private InputEvents ie;
 	private Action action;
+	private String xmlnssla;
+	
+
+	
 
 	public String getName() {
 		return name;
@@ -45,7 +51,11 @@ public class Coordinator {
 	public Controls getControls() {
 		return controls;
 	}
+	public String getXmlnssla() {
+		return xmlnssla;
+	}
 
+	
 	public Action getAction() {
 		return action;
 	}
@@ -79,7 +89,11 @@ public class Coordinator {
 	public void setXmlns(String xmlns) {
 		this.xmlns = xmlns;
 	}
-
+	@XmlAttribute(name="xmlns:sla")
+	public void setXmlnssla(String xmlnssla) {
+		this.xmlnssla = xmlnssla;
+	}
+	
 	@XmlElement(name="controls")
 	public void setControls(Controls controls) {
 		this.controls = controls;
@@ -88,6 +102,24 @@ public class Coordinator {
 	@XmlElement(name="action")
 	public void setAction(Action action) {
 		this.action = action;
+	}
+	
+	public Datasets getDs() {
+		return ds;
+	}
+
+	public InputEvents getIe() {
+		return ie;
+	}
+
+	@XmlElement(name="datasets")
+	public void setDs(Datasets ds) {
+		this.ds = ds;
+	}
+
+	@XmlElement(name="input-events")
+	public void setIe(InputEvents ie) {
+		this.ie = ie;
 	}
 
 }
