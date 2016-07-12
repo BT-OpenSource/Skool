@@ -92,23 +92,23 @@ update_mode=
 
 ########################### FILE SYSTEM DETAILS REQUIRED IF  import export file flag is 3 or 4 #########
 #The base directory where the input files exists
-file_base_directory=
+file_base_directory= 
 #The delimiter that separates fields in the file
-file_delimiter=
-# The table name for the files in cluster
-file_hive_table_name=
-# The control file name that indicates successful transmission of the file
-control_file_name=
+file_delimiter= <like comma(,), colon(:) etc>
+# The table name for the files in hdfs
+file_hive_table_name= 
+# The control file name that indicates successful transmission of a batch of files from source to hdfs
+control_file_name= 
 # The name of the mapping sheet that contains the column name and the data type of each column
 mapping_sheet_name=
 # The pattern to identify which files to be processed
-file_mask=
+file_mask= 
 # The date format of the date fields in the files. If this field is blank, default date format will be take as yyyy-MM-dd HH:mm:ss
-file_date_format=
+file_date_format= 
 # The line number in the file from which the actual records start to skip the header.
-line_number=
+line_number= 
 # An indicator if the file trailer is present
-file_trailer_present=
+file_trailer_present= 
 # If the file trailer is present,  keyword to identify the file trailer
 file_trailer_keyword=
 file_header_keyword=
