@@ -89,4 +89,43 @@ mv configuration/run.sh .
 sh run.sh 
 ```
 
+### How to contribute?
 
+Contribution for the enhancements in SKOOL are welcome and humbly requested by us. To contribute, please navigate to our GitHub project page and fork SKOOL main repository under your own account. You can make changes to your own forked repository and then open a Pull Request to merge your change with the main repo.
+
+Goto SKOOL@GitHub
+
+Clone the main repo (if you havn't done already)
+```sh
+	git clone "https://github.com/BT-Plc/Skool.git"
+	cd skool
+```
+Add your forked repo where you have write access and create your own branch.
+```sh
+	git remote add myrepo https://<your id>:<your password>@github.com/<YOUR ACCT NAME>/Skool.git
+	git checkout -b mybranch
+```
+Make and commit your changes to your own branch.
+```sh
+	git commit -am "My changes"
+```
+Push to your own branch in your own remote repo (myrepo).
+```sh
+	git push myrepo mybranch
+```
+Everyday better pull from the main repo(origin) and sync your repo with it.
+```sh
+	git checkout develop
+	git pull origin develop
+```
+Keep the develop branch only to have the latest main repo content. Make changes while you are in your own branch.
+
+Sync your code with the main repo. Push the latest content pulled from the main repo to your own repo in your own branch.
+```sh
+	git checkout mybranch
+	git merge develop
+	git push myrepo mybranch
+```
+When you are ready to submit your contribution to the main repo, please open a pull request.
+	
+If you want to report a bug, see/request a feature or work on something please feel free to wite us at SKOOL.SUPPORT@bt.com
