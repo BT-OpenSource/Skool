@@ -97,7 +97,7 @@ Goto SKOOL@GitHub
 
 Clone the main repo (if you havn't done already)
 ```sh
-	git clone "https://github.com/BT-Plc/Skool.git"
+	git clone "https://github.com/BTplc/Skool.git"
 	cd skool
 ```
 Add your forked repo where you have write access and create your own branch.
